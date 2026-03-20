@@ -136,6 +136,7 @@ object FirJvmExposeBoxedChecker : FirBasicDeclarationChecker(MppCheckerKind.Comm
     }
 
     // If the inline class is not return type, it is safe to name both boxed and unboxed versions the same.
+    @OptIn(SymbolInternals::class)
     private fun FirCallableDeclaration.canBeOverloadedByExposed(session: FirSession): Boolean {
         if (receiverParameter?.typeRef?.isInline(session) == true) return true
         if (contextParameters.any { it.returnTypeRef.isInline(session) }) return true
@@ -143,11 +144,14 @@ object FirJvmExposeBoxedChecker : FirBasicDeclarationChecker(MppCheckerKind.Comm
         // Check dispatch receiver as well - we use `-impl` suffix for them
         if (this !is FirConstructor) {
             val containingClass = containingClassLookupTag()?.toRegularClassSymbol(session)
-            return containingClass?.isInlineOrValue == true
+            return containingClass?.isInlineOrValue == true && !containingClass.fir.isExtendedValueClass
         }
         return false
     }
 
-    private fun FirTypeRef.isInline(session: FirSession): Boolean =
-        toRegularClassSymbol(session)?.isInlineOrValue ?: false
+    @OptIn(SymbolInternals::class)
+    private fun FirTypeRef.isInline(session: FirSession): Boolean {
+        val classSymbol = toRegularClassSymbol(session) ?: return false
+        return classSymbol.isInlineOrValue && !classSymbol.fir.isExtendedValueClass
+    }
 }
