@@ -21,6 +21,7 @@ import org.jetbrains.kotlin.fir.analysis.checkers.context.CheckerContext
 import org.jetbrains.kotlin.fir.analysis.checkers.declaration.FirPropertyChecker
 import org.jetbrains.kotlin.fir.analysis.checkers.declaration.needsJvmInlineMultiFieldValueClassFlattening
 import org.jetbrains.kotlin.fir.analysis.diagnostics.jvm.FirJvmErrors
+import org.jetbrains.kotlin.fir.analysis.isInlineClassThatRequiresMangling
 import org.jetbrains.kotlin.fir.containingClassLookupTag
 import org.jetbrains.kotlin.fir.declarations.*
 import org.jetbrains.kotlin.fir.declarations.utils.*
@@ -134,14 +135,4 @@ object FirJvmFieldApplicabilityChecker : FirPropertyChecker(MppCheckerKind.Commo
     private fun isInsideJvmMultifileClassFile(): Boolean {
         return context.containingFileSymbol?.hasAnnotation(JVM_MULTIFILE_CLASS_ID, context.session) == true
     }
-}
-
-@OptIn(SymbolInternals::class)
-fun FirTypeRef.isInlineClassThatRequiresMangling(session: FirSession): Boolean {
-    val symbol = this.coneType.toRegularClassSymbol(session) ?: return false
-    return symbol.fir.isBasicValueClass && !symbol.isDontMangleClass()
-}
-
-private fun FirRegularClassSymbol.isDontMangleClass(): Boolean {
-    return this.classId == StandardClassIds.Result
 }
