@@ -30,7 +30,7 @@ declare namespace JS_TESTS {
             const Symbol: unique symbol;
         }
         interface ExportedParent {
-            anotherParentMethod(): any/* kotlin.collections.List<string> */;
+            anotherParentMethod(): any/* kotlin.collections.KtList<string> */;
             parentAsyncMethod(): Promise<string>;
             withDefaultImplementation(): string;
             anotherDefaultImplementation(): string;
@@ -90,7 +90,7 @@ declare namespace JS_TESTS {
         class KotlinFooImpl implements foo.IFoo<string> {
             constructor();
             foo(): string;
-            anotherParentMethod(): any/* kotlin.collections.List<string> */;
+            anotherParentMethod(): any/* kotlin.collections.KtList<string> */;
             withBridge(x: string): string;
             withDefaults(value?: string): string;
             asyncFoo(): Promise<string>;

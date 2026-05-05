@@ -8,8 +8,8 @@ export declare const variable: {
     set(value: number): void;
 };
 export declare function box(): string;
-export declare function asyncList(): Promise<any/* List<number> */>;
-export declare function arrayOfLists(): Array<any/* List<number> */>;
+export declare function asyncList(): Promise<any/* KtList<number> */>;
+export declare function arrayOfLists(): Array<any/* KtList<number> */>;
 declare function justSomeDefaultExport(): string;
 export default justSomeDefaultExport;
 export declare class C {
