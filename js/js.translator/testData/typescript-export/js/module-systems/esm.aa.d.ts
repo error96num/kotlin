@@ -1,5 +1,11 @@
 type Nullable<T> = T | null | undefined
 declare function KtSingleton<T>(): T & (abstract new() => any);
+export declare interface KtList<out E> /* extends Collection<E> */ {
+    asJsReadonlyArrayView(): ReadonlyArray<E>;
+    readonly __doNotUseOrImplementIt: {
+        readonly "kotlin.collections.KtList": unique symbol;
+    };
+}
 export declare const value: {
     get(): number;
 };
@@ -8,8 +14,8 @@ export declare const variable: {
     set(value: number): void;
 };
 export declare function box(): string;
-export declare function asyncList(): Promise<any/* KtList<number> */>;
-export declare function arrayOfLists(): Array<any/* KtList<number> */>;
+export declare function asyncList(): Promise<KtList<number>>;
+export declare function arrayOfLists(): Array<KtList<number>>;
 declare function justSomeDefaultExport(): string;
 export default justSomeDefaultExport;
 export declare class C {
