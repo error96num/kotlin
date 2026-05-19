@@ -36,6 +36,15 @@ val testJsRuntime: Configuration by configurations.creating {
 
 dependencies {
     implementation(project(":kotlin-stdlib"))
+    implementation(project(":compiler:backend.common.jvm"))
+    implementation(project(":compiler:container"))
+    implementation(project(":compiler:resolution"))
+    implementation(project(":compiler:serialization"))
+    implementation(project(":core:descriptors"))
+    implementation(project(":core:descriptors.jvm"))
+    implementation(project(":core:language.targets.jvm"))
+    implementation(project(":js:js.frontend"))
+    implementation(project(":kotlin-util-klib-metadata"))
     compileOnly(project(":compiler:frontend"))
     compileOnly(project(":compiler:backend.jvm"))
     compileOnly(project(":compiler:cli-base"))

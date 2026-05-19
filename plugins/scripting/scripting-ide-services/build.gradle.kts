@@ -18,6 +18,10 @@ dependencies {
     api(project(":kotlin-scripting-jvm"))
     compileOnly(project(":kotlin-scripting-compiler"))
     compileOnly(project(":compiler:cli"))
+    implementation(project(":core:descriptors"))
+    implementation(project(":compiler:container"))
+    implementation(project(":compiler:frontend"))
+    implementation(project(":compiler:resolution"))
     compileOnly(commonDependency("org.jetbrains.kotlin:kotlin-reflect")) { isTransitive = false }
     compileOnly(intellijCore())
     publishedRuntime(project(":kotlin-compiler"))

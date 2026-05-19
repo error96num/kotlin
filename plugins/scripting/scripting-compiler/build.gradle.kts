@@ -39,6 +39,12 @@ dependencies {
     api(commonDependency("org.jline", "jline"))
     compileOnly(intellijCore())
 
+    implementation(project(":core:descriptors"))
+    implementation(project(":core:descriptors.jvm"))
+    implementation(project(":core:deserialization"))
+    implementation(project(":compiler:container"))
+    implementation(project(":compiler:ir.psi2ir"))
+    implementation(project(":compiler:resolution"))
     implementation(project(":kotlin-power-assert-compiler-plugin")) // TODO: KT-74787
     implementation(commonDependency("org.jetbrains.kotlin:kotlin-reflect")) { isTransitive = false }
 

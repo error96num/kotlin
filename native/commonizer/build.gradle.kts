@@ -36,6 +36,10 @@ dependencies {
     compileOnly(intellijCore())
     compileOnly(libs.intellij.fastutil)
 
+    implementation(project(":core:descriptors"))
+    implementation(project(":core:deserialization"))
+    implementation(project(":core:deserialization.common"))
+
     // This dependency is necessary to keep the right dependency record inside of POM file:
     publishedCompile(project(":kotlin-compiler"))
 

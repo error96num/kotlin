@@ -7,6 +7,8 @@ plugins {
 }
 
 dependencies {
+    implementation(project(":core:descriptors"))
+    implementation(project(":compiler:resolution"))
     compileOnly(project(":compiler:frontend"))
     compileOnly(project(":compiler:frontend.java"))
     compileOnly(project(":compiler:psi:psi-api"))
