@@ -288,6 +288,8 @@ fun Project.configureTests() {
             ":kotlin-build-common",
             ":kotlin-compiler-client-embeddable",
             ":kotlin-compiler-embeddable",
+            /* TODO: Uncomment when blocking issues in `test-inputs-check-v2` are resolved */
+            ":kotlin-compiler-native-image",
             ":kotlin-daemon-client",
             ":kotlin-gradle-plugin",
             ":kotlin-gradle-plugin-dsl-codegen",
