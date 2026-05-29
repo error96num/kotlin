@@ -314,6 +314,11 @@ internal fun <T> jsYieldStar(value: T): T
 // @JsIntrinsic
 // TODO: after the next bootstrap drop the body of this function, and uncomment the @JsIntrinsic annotation;
 @UsedFromCompilerGeneratedCode
+internal fun <T> jsSuspendValue(value: T): T = value
+
+// @JsIntrinsic
+// TODO: after the next bootstrap drop the body of this function, and uncomment the @JsIntrinsic annotation;
+@UsedFromCompilerGeneratedCode
 internal fun jsGenerateInterfaceSymbol(): dynamic =
     generateInterfaceSymbolById()
 

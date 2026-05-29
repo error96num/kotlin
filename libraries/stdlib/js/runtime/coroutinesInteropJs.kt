@@ -19,7 +19,7 @@ internal suspend fun <T> suspendLambdaRun(value: dynamic): T {
     if (value.constructor === js("Promise")) {
         return await(value)
     } else {
-        return jsYieldStar(value)
+        return jsSuspendValue(value)
     }
 }
 
