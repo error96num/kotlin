@@ -47,6 +47,17 @@ class K2JSCompilerArguments : K2WasmCompilerArguments() {
         }
 
     @Argument(
+        value = "-Xenable-suspend-lambdas-exporting",
+        description = "Enable exporting suspend lambdas to JavaScript/TypeScript.",
+    )
+    @Enables(LanguageFeature.JsAllowExportingSuspendLambdas)
+    var allowExportingSuspendLambdas: Boolean = false
+        set(value) {
+            checkFrozen()
+            field = value
+        }
+
+    @Argument(
         value = "-Xes-arrow-functions",
         description = "Use ES2015 arrow functions in the JavaScript code generated for Kotlin lambdas. Enabled by default in case of ES2015 target usage",
     )

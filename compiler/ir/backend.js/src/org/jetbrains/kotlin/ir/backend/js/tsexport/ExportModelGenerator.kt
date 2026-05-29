@@ -32,6 +32,7 @@ import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.ir.util.isNullable
 import org.jetbrains.kotlin.js.common.makeValidES5Identifier
 import org.jetbrains.kotlin.js.config.compileLongAsBigint
+import org.jetbrains.kotlin.js.config.compileSuspendAsJsGenerator
 import org.jetbrains.kotlin.js.util.NameTable
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.utils.*
@@ -43,6 +44,9 @@ private const val notImplementablePropertyName = "__doNotUseOrImplementIt"
 
 class ExportModelGenerator(val context: JsIrBackendContext, val isEsModules: Boolean) {
     private val transitiveExportCollector = TransitiveExportCollector(context)
+    private val allowExportSuspendLambdas = context.configuration.languageVersionSettings.supportsFeature(
+        LanguageFeature.JsAllowExportingSuspendLambdas
+    )
     private val allowImplementingInterfaces = context.configuration.languageVersionSettings.supportsFeature(
         LanguageFeature.JsExportInterfacesInImplementableWay
     )
@@ -990,8 +994,7 @@ class ExportModelGenerator(val context: JsIrBackendContext, val isEsModules: Boo
             nonNullType.isUnit() -> ExportedType.Primitive.Unit
             nonNullType.isNothing() -> ExportedType.Primitive.Nothing
             nonNullType.isArray() -> ExportedType.Array(exportTypeArgument(nonNullType.arguments[0], typeOwner, typeParameterScope))
-            nonNullType.isSuspendFunction() -> ExportedType.ErrorType("Suspend functions are not supported")
-            nonNullType.isFunction() -> ExportedType.Function(
+            nonNullType.isFunction() || (allowExportSuspendLambdas && context.configuration.compileSuspendAsJsGenerator && nonNullType.isSuspendFunction()) -> ExportedType.Function(
                 parameters = nonNullType.arguments.dropLast(1).memoryOptimizedMap {
                     ExportedParameter(
                         name = (it as? IrTypeProjection)?.type?.getAnnotationArgumentValue(StandardNames.FqNames.parameterName, "name"),
@@ -999,7 +1002,11 @@ class ExportModelGenerator(val context: JsIrBackendContext, val isEsModules: Boo
                     )
                 },
                 returnType = exportTypeArgument(nonNullType.arguments.last(), typeOwner, typeParameterScope)
+                    .butIf(nonNullType.isSuspendFunction()) {
+                        ExportedType.ClassType(name = FqName("Promise"), arguments = listOf(it))
+                    }
             )
+            nonNullType.isSuspendFunction() -> ExportedType.ErrorType("Suspend functions are not supported")
 
             classifier is IrTypeParameterSymbol -> typeParameterScope[classifier]?.let(ExportedType::TypeParameterRef)
                 ?: error("Type parameter '${classifier.owner.render()}' is not in scope")
