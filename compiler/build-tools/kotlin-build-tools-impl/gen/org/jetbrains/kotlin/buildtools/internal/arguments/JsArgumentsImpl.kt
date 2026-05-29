@@ -27,6 +27,7 @@ import org.jetbrains.kotlin.buildtools.`internal`.arguments.JsArgumentsImpl.Comp
 import org.jetbrains.kotlin.buildtools.`internal`.arguments.JsArgumentsImpl.Companion.X_ENABLE_EXTENSION_FUNCTIONS_IN_EXTERNALS
 import org.jetbrains.kotlin.buildtools.`internal`.arguments.JsArgumentsImpl.Companion.X_ENABLE_IMPLEMENTING_INTERFACES_FROM_TYPESCRIPT
 import org.jetbrains.kotlin.buildtools.`internal`.arguments.JsArgumentsImpl.Companion.X_ENABLE_SUSPEND_FUNCTION_EXPORTING
+import org.jetbrains.kotlin.buildtools.`internal`.arguments.JsArgumentsImpl.Companion.X_ENABLE_SUSPEND_LAMBDAS_EXPORTING
 import org.jetbrains.kotlin.buildtools.`internal`.arguments.JsArgumentsImpl.Companion.X_ES_ARROW_FUNCTIONS
 import org.jetbrains.kotlin.buildtools.`internal`.arguments.JsArgumentsImpl.Companion.X_ES_CLASSES
 import org.jetbrains.kotlin.buildtools.`internal`.arguments.JsArgumentsImpl.Companion.X_ES_GENERATORS
@@ -144,6 +145,7 @@ internal class JsArgumentsImpl(
     if (X_ENABLE_EXTENSION_FUNCTIONS_IN_EXTERNALS in this) { arguments.extensionFunctionsInExternals = get(X_ENABLE_EXTENSION_FUNCTIONS_IN_EXTERNALS)}
     if (X_ENABLE_IMPLEMENTING_INTERFACES_FROM_TYPESCRIPT in this) { arguments.allowImplementableInterfacesExporting = get(X_ENABLE_IMPLEMENTING_INTERFACES_FROM_TYPESCRIPT)}
     if (X_ENABLE_SUSPEND_FUNCTION_EXPORTING in this) { arguments.allowExportingSuspendFunctions = get(X_ENABLE_SUSPEND_FUNCTION_EXPORTING)}
+    if (X_ENABLE_SUSPEND_LAMBDAS_EXPORTING in this) { arguments.allowExportingSuspendLambdas = get(X_ENABLE_SUSPEND_LAMBDAS_EXPORTING)}
     if (X_ES_ARROW_FUNCTIONS in this) { arguments.useEsArrowFunctions = get(X_ES_ARROW_FUNCTIONS)}
     if (X_ES_CLASSES in this) { arguments.useEsClasses = get(X_ES_CLASSES)}
     if (X_ES_GENERATORS in this) { arguments.useEsGenerators = get(X_ES_GENERATORS)}
@@ -174,6 +176,7 @@ internal class JsArgumentsImpl(
     try { this[X_ENABLE_EXTENSION_FUNCTIONS_IN_EXTERNALS] = arguments.extensionFunctionsInExternals } catch (_: NoSuchMethodError) {  }
     try { this[X_ENABLE_IMPLEMENTING_INTERFACES_FROM_TYPESCRIPT] = arguments.allowImplementableInterfacesExporting } catch (_: NoSuchMethodError) {  }
     try { this[X_ENABLE_SUSPEND_FUNCTION_EXPORTING] = arguments.allowExportingSuspendFunctions } catch (_: NoSuchMethodError) {  }
+    try { this[X_ENABLE_SUSPEND_LAMBDAS_EXPORTING] = arguments.allowExportingSuspendLambdas } catch (_: NoSuchMethodError) {  }
     try { this[X_ES_ARROW_FUNCTIONS] = arguments.useEsArrowFunctions } catch (_: NoSuchMethodError) {  }
     try { this[X_ES_CLASSES] = arguments.useEsClasses } catch (_: NoSuchMethodError) {  }
     try { this[X_ES_GENERATORS] = arguments.useEsGenerators } catch (_: NoSuchMethodError) {  }
@@ -202,6 +205,7 @@ internal class JsArgumentsImpl(
     if (X_ENABLE_EXTENSION_FUNCTIONS_IN_EXTERNALS in this) { arguments.extensionFunctionsInExternals = get(X_ENABLE_EXTENSION_FUNCTIONS_IN_EXTERNALS)}
     if (X_ENABLE_IMPLEMENTING_INTERFACES_FROM_TYPESCRIPT in this) { arguments.allowImplementableInterfacesExporting = get(X_ENABLE_IMPLEMENTING_INTERFACES_FROM_TYPESCRIPT)}
     if (X_ENABLE_SUSPEND_FUNCTION_EXPORTING in this) { arguments.allowExportingSuspendFunctions = get(X_ENABLE_SUSPEND_FUNCTION_EXPORTING)}
+    if (X_ENABLE_SUSPEND_LAMBDAS_EXPORTING in this) { arguments.allowExportingSuspendLambdas = get(X_ENABLE_SUSPEND_LAMBDAS_EXPORTING)}
     if (X_ES_ARROW_FUNCTIONS in this) { arguments.useEsArrowFunctions = get(X_ES_ARROW_FUNCTIONS)}
     if (X_ES_CLASSES in this) { arguments.useEsClasses = get(X_ES_CLASSES)}
     if (X_ES_GENERATORS in this) { arguments.useEsGenerators = get(X_ES_GENERATORS)}
@@ -263,6 +267,9 @@ internal class JsArgumentsImpl(
 
     public val X_ENABLE_SUSPEND_FUNCTION_EXPORTING: JsArgument<Boolean> =
         JsArgument("X_ENABLE_SUSPEND_FUNCTION_EXPORTING")
+
+    public val X_ENABLE_SUSPEND_LAMBDAS_EXPORTING: JsArgument<Boolean> =
+        JsArgument("X_ENABLE_SUSPEND_LAMBDAS_EXPORTING")
 
     public val X_ES_ARROW_FUNCTIONS: JsArgument<Boolean?> = JsArgument("X_ES_ARROW_FUNCTIONS")
 
