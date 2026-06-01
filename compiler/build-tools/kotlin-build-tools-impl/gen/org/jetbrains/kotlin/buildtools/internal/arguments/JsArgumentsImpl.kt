@@ -27,7 +27,6 @@ import org.jetbrains.kotlin.buildtools.`internal`.arguments.JsArgumentsImpl.Comp
 import org.jetbrains.kotlin.buildtools.`internal`.arguments.JsArgumentsImpl.Companion.X_ENABLE_EXTENSION_FUNCTIONS_IN_EXTERNALS
 import org.jetbrains.kotlin.buildtools.`internal`.arguments.JsArgumentsImpl.Companion.X_ENABLE_IMPLEMENTING_INTERFACES_FROM_TYPESCRIPT
 import org.jetbrains.kotlin.buildtools.`internal`.arguments.JsArgumentsImpl.Companion.X_ENABLE_SUSPEND_FUNCTION_EXPORTING
-import org.jetbrains.kotlin.buildtools.`internal`.arguments.JsArgumentsImpl.Companion.X_ENABLE_SUSPEND_LAMBDAS_EXPORTING
 import org.jetbrains.kotlin.buildtools.`internal`.arguments.JsArgumentsImpl.Companion.X_ES_ARROW_FUNCTIONS
 import org.jetbrains.kotlin.buildtools.`internal`.arguments.JsArgumentsImpl.Companion.X_ES_CLASSES
 import org.jetbrains.kotlin.buildtools.`internal`.arguments.JsArgumentsImpl.Companion.X_ES_GENERATORS
@@ -43,6 +42,7 @@ import org.jetbrains.kotlin.buildtools.`internal`.arguments.JsArgumentsImpl.Comp
 import org.jetbrains.kotlin.buildtools.`internal`.arguments.JsArgumentsImpl.Companion.X_IR_SAFE_EXTERNAL_BOOLEAN_DIAGNOSTIC
 import org.jetbrains.kotlin.buildtools.`internal`.arguments.JsArgumentsImpl.Companion.X_OPTIMIZE_GENERATED_JS
 import org.jetbrains.kotlin.buildtools.`internal`.arguments.JsArgumentsImpl.Companion.X_PLATFORM_ARGUMENTS_IN_MAIN_FUNCTION
+import org.jetbrains.kotlin.buildtools.`internal`.arguments.JsArgumentsImpl.Companion.X_SUSPEND_LAMBDA_EXPORTING
 import org.jetbrains.kotlin.buildtools.`internal`.arguments.JsArgumentsImpl.Companion.X_TYPED_ARRAYS
 import org.jetbrains.kotlin.buildtools.api.CompilerArgumentsParseException
 import org.jetbrains.kotlin.buildtools.api.KotlinReleaseVersion
@@ -145,7 +145,6 @@ internal class JsArgumentsImpl(
     if (X_ENABLE_EXTENSION_FUNCTIONS_IN_EXTERNALS in this) { arguments.extensionFunctionsInExternals = get(X_ENABLE_EXTENSION_FUNCTIONS_IN_EXTERNALS)}
     if (X_ENABLE_IMPLEMENTING_INTERFACES_FROM_TYPESCRIPT in this) { arguments.allowImplementableInterfacesExporting = get(X_ENABLE_IMPLEMENTING_INTERFACES_FROM_TYPESCRIPT)}
     if (X_ENABLE_SUSPEND_FUNCTION_EXPORTING in this) { arguments.allowExportingSuspendFunctions = get(X_ENABLE_SUSPEND_FUNCTION_EXPORTING)}
-    if (X_ENABLE_SUSPEND_LAMBDAS_EXPORTING in this) { arguments.allowExportingSuspendLambdas = get(X_ENABLE_SUSPEND_LAMBDAS_EXPORTING)}
     if (X_ES_ARROW_FUNCTIONS in this) { arguments.useEsArrowFunctions = get(X_ES_ARROW_FUNCTIONS)}
     if (X_ES_CLASSES in this) { arguments.useEsClasses = get(X_ES_CLASSES)}
     if (X_ES_GENERATORS in this) { arguments.useEsGenerators = get(X_ES_GENERATORS)}
@@ -161,6 +160,7 @@ internal class JsArgumentsImpl(
     if (X_IR_SAFE_EXTERNAL_BOOLEAN_DIAGNOSTIC in this) { arguments.irSafeExternalBooleanDiagnostic = get(X_IR_SAFE_EXTERNAL_BOOLEAN_DIAGNOSTIC)?.stringValue}
     if (X_OPTIMIZE_GENERATED_JS in this) { arguments.optimizeGeneratedJs = get(X_OPTIMIZE_GENERATED_JS)}
     if (X_PLATFORM_ARGUMENTS_IN_MAIN_FUNCTION in this) { arguments.platformArgumentsProviderJsExpression = get(X_PLATFORM_ARGUMENTS_IN_MAIN_FUNCTION)}
+    if (X_SUSPEND_LAMBDA_EXPORTING in this) { arguments.allowExportingSuspendLambdas = get(X_SUSPEND_LAMBDA_EXPORTING)}
     try { if (X_TYPED_ARRAYS in this) { arguments.setUsingReflection("typedArrays", get(X_TYPED_ARRAYS))} } catch (e: NoSuchMethodError) { throw IllegalStateException("""Compiler parameter not recognized: X_TYPED_ARRAYS. Current compiler version is: $KC_VERSION, but the argument was removed in 2.3.0""").initCause(e) }
     if (MODULE_KIND in this) { arguments.moduleKind = get(MODULE_KIND)?.stringValue}
     try { if (OUTPUT in this) { arguments.setUsingReflection("outputFile", get(OUTPUT))} } catch (e: NoSuchMethodError) { throw IllegalStateException("""Compiler parameter not recognized: OUTPUT. Current compiler version is: $KC_VERSION, but the argument was removed in 2.2.0""").initCause(e) }
@@ -176,7 +176,6 @@ internal class JsArgumentsImpl(
     try { this[X_ENABLE_EXTENSION_FUNCTIONS_IN_EXTERNALS] = arguments.extensionFunctionsInExternals } catch (_: NoSuchMethodError) {  }
     try { this[X_ENABLE_IMPLEMENTING_INTERFACES_FROM_TYPESCRIPT] = arguments.allowImplementableInterfacesExporting } catch (_: NoSuchMethodError) {  }
     try { this[X_ENABLE_SUSPEND_FUNCTION_EXPORTING] = arguments.allowExportingSuspendFunctions } catch (_: NoSuchMethodError) {  }
-    try { this[X_ENABLE_SUSPEND_LAMBDAS_EXPORTING] = arguments.allowExportingSuspendLambdas } catch (_: NoSuchMethodError) {  }
     try { this[X_ES_ARROW_FUNCTIONS] = arguments.useEsArrowFunctions } catch (_: NoSuchMethodError) {  }
     try { this[X_ES_CLASSES] = arguments.useEsClasses } catch (_: NoSuchMethodError) {  }
     try { this[X_ES_GENERATORS] = arguments.useEsGenerators } catch (_: NoSuchMethodError) {  }
@@ -192,6 +191,7 @@ internal class JsArgumentsImpl(
     try { this[X_IR_SAFE_EXTERNAL_BOOLEAN_DIAGNOSTIC] = arguments.irSafeExternalBooleanDiagnostic?.let { JsIrDiagnosticMode.entries.firstOrNull { entry -> entry.stringValue.equals(it, true) }?.also { entry -> checkCaseMatches(_restrictedArgViolations, arguments::irSafeExternalBooleanDiagnostic, entry.stringValue, it) } ?: throw CompilerArgumentsParseException("Unknown -Xir-safe-external-boolean-diagnostic value: $it") } } catch (ex: CompilerArgumentsParseException) { _argumentValidationErrors.add(ex.message ?: "Error parsing compiler arguments") } catch (_: NoSuchMethodError) {  }
     try { this[X_OPTIMIZE_GENERATED_JS] = arguments.optimizeGeneratedJs } catch (_: NoSuchMethodError) {  }
     try { this[X_PLATFORM_ARGUMENTS_IN_MAIN_FUNCTION] = arguments.platformArgumentsProviderJsExpression } catch (_: NoSuchMethodError) {  }
+    try { this[X_SUSPEND_LAMBDA_EXPORTING] = arguments.allowExportingSuspendLambdas } catch (_: NoSuchMethodError) {  }
     try { this[X_TYPED_ARRAYS] = arguments.getUsingReflection("typedArrays") } catch (_: NoSuchMethodError) {  }
     try { this[MODULE_KIND] = arguments.moduleKind?.let { JsModuleKind.entries.firstOrNull { entry -> entry.stringValue.equals(it, true) }?.also { entry -> checkCaseMatches(_restrictedArgViolations, arguments::moduleKind, entry.stringValue, it) } ?: throw CompilerArgumentsParseException("Unknown -module-kind value: $it") } } catch (ex: CompilerArgumentsParseException) { _argumentValidationErrors.add(ex.message ?: "Error parsing compiler arguments") } catch (_: NoSuchMethodError) {  }
     try { this[OUTPUT] = arguments.getUsingReflection("outputFile") } catch (_: NoSuchMethodError) {  }
@@ -205,7 +205,6 @@ internal class JsArgumentsImpl(
     if (X_ENABLE_EXTENSION_FUNCTIONS_IN_EXTERNALS in this) { arguments.extensionFunctionsInExternals = get(X_ENABLE_EXTENSION_FUNCTIONS_IN_EXTERNALS)}
     if (X_ENABLE_IMPLEMENTING_INTERFACES_FROM_TYPESCRIPT in this) { arguments.allowImplementableInterfacesExporting = get(X_ENABLE_IMPLEMENTING_INTERFACES_FROM_TYPESCRIPT)}
     if (X_ENABLE_SUSPEND_FUNCTION_EXPORTING in this) { arguments.allowExportingSuspendFunctions = get(X_ENABLE_SUSPEND_FUNCTION_EXPORTING)}
-    if (X_ENABLE_SUSPEND_LAMBDAS_EXPORTING in this) { arguments.allowExportingSuspendLambdas = get(X_ENABLE_SUSPEND_LAMBDAS_EXPORTING)}
     if (X_ES_ARROW_FUNCTIONS in this) { arguments.useEsArrowFunctions = get(X_ES_ARROW_FUNCTIONS)}
     if (X_ES_CLASSES in this) { arguments.useEsClasses = get(X_ES_CLASSES)}
     if (X_ES_GENERATORS in this) { arguments.useEsGenerators = get(X_ES_GENERATORS)}
@@ -221,6 +220,7 @@ internal class JsArgumentsImpl(
     if (X_IR_SAFE_EXTERNAL_BOOLEAN_DIAGNOSTIC in this) { arguments.irSafeExternalBooleanDiagnostic = get(X_IR_SAFE_EXTERNAL_BOOLEAN_DIAGNOSTIC)?.stringValue}
     if (X_OPTIMIZE_GENERATED_JS in this) { arguments.optimizeGeneratedJs = get(X_OPTIMIZE_GENERATED_JS)}
     if (X_PLATFORM_ARGUMENTS_IN_MAIN_FUNCTION in this) { arguments.platformArgumentsProviderJsExpression = get(X_PLATFORM_ARGUMENTS_IN_MAIN_FUNCTION)}
+    if (X_SUSPEND_LAMBDA_EXPORTING in this) { arguments.allowExportingSuspendLambdas = get(X_SUSPEND_LAMBDA_EXPORTING)}
     try { if (X_TYPED_ARRAYS in this) { arguments.setUsingReflection("typedArrays", get(X_TYPED_ARRAYS))} } catch (e: NoSuchMethodError) { throw IllegalStateException("""Compiler parameter not recognized: X_TYPED_ARRAYS. Current compiler version is: $KC_VERSION, but the argument was removed in 2.3.0""").initCause(e) }
     if (MODULE_KIND in this) { arguments.moduleKind = get(MODULE_KIND)?.stringValue}
     try { if (OUTPUT in this) { arguments.setUsingReflection("outputFile", get(OUTPUT))} } catch (e: NoSuchMethodError) { throw IllegalStateException("""Compiler parameter not recognized: OUTPUT. Current compiler version is: $KC_VERSION, but the argument was removed in 2.2.0""").initCause(e) }
@@ -268,9 +268,6 @@ internal class JsArgumentsImpl(
     public val X_ENABLE_SUSPEND_FUNCTION_EXPORTING: JsArgument<Boolean> =
         JsArgument("X_ENABLE_SUSPEND_FUNCTION_EXPORTING")
 
-    public val X_ENABLE_SUSPEND_LAMBDAS_EXPORTING: JsArgument<Boolean> =
-        JsArgument("X_ENABLE_SUSPEND_LAMBDAS_EXPORTING")
-
     public val X_ES_ARROW_FUNCTIONS: JsArgument<Boolean?> = JsArgument("X_ES_ARROW_FUNCTIONS")
 
     public val X_ES_CLASSES: JsArgument<Boolean?> = JsArgument("X_ES_CLASSES")
@@ -305,6 +302,9 @@ internal class JsArgumentsImpl(
 
     public val X_PLATFORM_ARGUMENTS_IN_MAIN_FUNCTION: JsArgument<String?> =
         JsArgument("X_PLATFORM_ARGUMENTS_IN_MAIN_FUNCTION")
+
+    public val X_SUSPEND_LAMBDA_EXPORTING: JsArgument<Boolean> =
+        JsArgument("X_SUSPEND_LAMBDA_EXPORTING")
 
     public val X_TYPED_ARRAYS: JsArgument<Boolean> = JsArgument("X_TYPED_ARRAYS")
 
