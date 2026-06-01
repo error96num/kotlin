@@ -28,7 +28,7 @@ private val continuationSymbol = Continuation::class.js.asDynamic().Symbol
 @UsedFromCompilerGeneratedCode
 internal fun <T> orPromise(continuation: dynamic, lambda: dynamic): dynamic {
     if (continuation != VOID && continuation[continuationSymbol]) {
-        return lambda()
+        return lambda(continuation)
     } else {
         return promisify<T>(lambda)
     }
