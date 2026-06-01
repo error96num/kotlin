@@ -20,6 +20,6 @@ internal fun MutableMap<LanguageFeature, LanguageFeature.State>.configureJsLangu
     }
 
     if (arguments.allowExportingSuspendLambdas) {
-        put(LanguageFeature.JsAllowExportingSuspendLambdas, LanguageFeature.State.ENABLED)
+        put(LanguageFeature.JsExportingSuspendLambdas, LanguageFeature.State.ENABLED)
     }
 }

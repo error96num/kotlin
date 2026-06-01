@@ -249,11 +249,11 @@ val actualJsArguments by compilerArgumentsLevel(CompilerArgumentsLevelNames.jsAr
     }
 
     compilerArgument {
-        name = "Xenable-suspend-lambdas-exporting"
+        name = "Xsuspend-lambda-exporting"
         compilerName = "allowExportingSuspendLambdas"
         description = "Enable exporting suspend lambdas to JavaScript/TypeScript.".asReleaseDependent()
         valueType = BooleanType.defaultFalse
-        additionalAnnotations(Enables(LanguageFeature.JsAllowExportingSuspendLambdas))
+        additionalAnnotations(Enables(LanguageFeature.JsExportingSuspendLambdas))
 
         lifecycle(
             introducedVersion = KotlinReleaseVersion.v2_4_0,

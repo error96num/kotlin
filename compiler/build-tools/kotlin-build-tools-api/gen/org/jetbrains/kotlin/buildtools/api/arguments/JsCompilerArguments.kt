@@ -64,7 +64,7 @@ public interface JsCompilerArguments : CommonJsAndWasmArguments {
      */
     @JvmField
     @ExperimentalCompilerArgument
-    public val X_ENABLE_SUSPEND_LAMBDAS_EXPORTING: JsCompilerArgument<Boolean> =
-        JsCompilerArgument("X_ENABLE_SUSPEND_LAMBDAS_EXPORTING", KotlinReleaseVersion(2, 4, 0))
+    public val X_SUSPEND_LAMBDA_EXPORTING: JsCompilerArgument<Boolean> =
+        JsCompilerArgument("X_SUSPEND_LAMBDA_EXPORTING", KotlinReleaseVersion(2, 4, 0))
   }
 }

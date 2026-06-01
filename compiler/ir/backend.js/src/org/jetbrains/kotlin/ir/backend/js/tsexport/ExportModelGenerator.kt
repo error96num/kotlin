@@ -45,7 +45,7 @@ private const val notImplementablePropertyName = "__doNotUseOrImplementIt"
 class ExportModelGenerator(val context: JsIrBackendContext, val isEsModules: Boolean) {
     private val transitiveExportCollector = TransitiveExportCollector(context)
     private val allowExportSuspendLambdas = context.configuration.languageVersionSettings.supportsFeature(
-        LanguageFeature.JsAllowExportingSuspendLambdas
+        LanguageFeature.JsExportingSuspendLambdas
     )
     private val allowImplementingInterfaces = context.configuration.languageVersionSettings.supportsFeature(
         LanguageFeature.JsExportInterfacesInImplementableWay

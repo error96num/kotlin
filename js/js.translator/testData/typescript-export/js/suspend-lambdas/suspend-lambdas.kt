@@ -3,7 +3,7 @@
 // RUN_PLAIN_BOX_FUNCTION
 // SKIP_NODE_JS
 // INFER_MAIN_MODULE
-// LANGUAGE: +JsAllowExportingSuspendFunctions +JsAllowExportingSuspendLambdas
+// LANGUAGE: +JsAllowExportingSuspendFunctions +JsExportingSuspendLambdas
 // MODULE: JS_TESTS
 // TSC_TARGET: es2020
 // FILE: suspend-lambdas.kt
