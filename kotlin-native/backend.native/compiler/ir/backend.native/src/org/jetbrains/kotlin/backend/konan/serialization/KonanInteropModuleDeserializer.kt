@@ -212,7 +212,7 @@ internal class KonanInteropModuleDeserializer(
             }
             val id = MetadataDeclarationId(declarationKind, packageFqName, declarationFqName)
 
-            val kmDeclarations = metadataReader.retrieveDeclarationsById(id)
+            val kmDeclarations = metadataReader.retrieveDeclarationsById(id, removeMetadataRepresentation = true)
             if (kmDeclarations != null) {
                 for (kmDeclaration in kmDeclarations) {
                     val irPackage = getOrCreateContainingPackageFragment(kmDeclaration)
@@ -286,8 +286,14 @@ internal class KonanInteropModuleDeserializer(
             // their parent class.
             if (!id.relativeDeclarationName.isOneSegmentFQN()) continue
 
-            val kmClass = (metadataReader.retrieveDeclarationsById(id)?.firstOrNull() as KmClass?) ?: continue
+            val kmClass = metadataReader.retrieveDeclarationsById(id, removeMetadataRepresentation = false)
+                    ?.firstOrNull() as? KmClass ?: continue
             if (kmClass.inheritsFromCStructOrEnum()) {
+                // At first, pass removeMetadataRepresentation = false, because we only use the metadata class to check if it is a C struct or enum.
+                // If it is, pass removeMetadataRepresentation = true, because we are going to actually deserialize it. This helps to ensure
+                // we only deserialize a given class once.
+                metadataReader.retrieveDeclarationsById(id, removeMetadataRepresentation = true)
+
                 val irPackage = getOrCreateContainingPackageFragment(kmClass)
                 val irClass = deserializeClass(kmClass, irPackage)
                 irPackage.addChild(irClass)
@@ -378,7 +384,8 @@ internal class KonanInteropModuleDeserializer(
         for (nestedClassName in kmClass.nestedClasses) {
             val nestedClassFqName = classFqName.child(Name.identifier(nestedClassName))
             val nestedClassId = MetadataDeclarationId(TopLevelSymbolKind.CLASS_SYMBOL, packageFqName, nestedClassFqName)
-            val nestedKmClass = metadataReader.retrieveDeclarationsById(nestedClassId)?.first() as KmClass? ?: continue
+            val nestedKmClass = metadataReader.retrieveDeclarationsById(nestedClassId, removeMetadataRepresentation = true)
+                    ?.first() as KmClass? ?: continue
             clazz.declarations += deserializeClass(nestedKmClass, clazz)
         }
 
@@ -941,10 +948,16 @@ internal class KonanInteropModuleDeserializer(
             return allMetadataDeclarations.keys
         }
 
-        // Note: calling this function a second time for the same id will return `null`.
-        fun retrieveDeclarationsById(id: MetadataDeclarationId): List<Any>? {
+        /**
+         * @param removeMetadataRepresentation - If true, calling this function a second time for the same id will return `null`.
+         */
+        fun retrieveDeclarationsById(id: MetadataDeclarationId, removeMetadataRepresentation: Boolean): List<Any>? {
             ensureDeclarationIdsLoaded()
-            val ref = allMetadataDeclarations.replace(id, null) ?: return null
+            val ref = if (removeMetadataRepresentation) {
+                allMetadataDeclarations.replace(id, null)
+            } else {
+                allMetadataDeclarations[id]
+            } ?: return null
             ref.get()?.let {
                 return it
             }
