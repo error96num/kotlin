@@ -101,6 +101,7 @@ internal class KonanInteropModuleDeserializer(
 
     override val kind get() = IrModuleDeserializerKind.DESERIALIZED
     override val moduleFragment: IrModuleFragment = IrModuleFragmentImpl(moduleDescriptor)
+    private val deserializedDeclarations = hashMapOf<IdSignature, IrDeclaration>()
     private var externalIrPackageFragment: IrExternalPackageFragment? = null
     private var typeDefinitionsIrFile: IrFile? = null
 
@@ -171,16 +172,16 @@ internal class KonanInteropModuleDeserializer(
             // If this would indeed happen, it's most likely because the symbol was deserialized by another instance of
             // KonanInteropModuleDeserializer, most likely by its contains() method. At this time we don't consider it a problem,
             // because we usually stop on the first module deserializer to return true, and don't call contains() afterwards.
-            return tryDeserializeIrSymbol(idSig, BinarySymbolData.SymbolKind.FUNCTION_SYMBOL)?.isBound == true ||
-                    tryDeserializeIrSymbol(idSig, BinarySymbolData.SymbolKind.PROPERTY_SYMBOL)?.isBound == true
+            return tryDeserializeIrSymbol(idSig, BinarySymbolData.SymbolKind.FUNCTION_SYMBOL) != null ||
+                    tryDeserializeIrSymbol(idSig, BinarySymbolData.SymbolKind.PROPERTY_SYMBOL) != null
         }
         return false
     }
 
     override fun tryDeserializeIrSymbol(idSig: IdSignature, symbolKind: BinarySymbolData.SymbolKind): IrSymbol? {
-        val symbol = symbolTable.referenceSymbolByKind(idSig, symbolKind) ?: return null
-        if (symbol.isBound) {
-            return symbol
+        deserializedDeclarations[idSig]?.let {
+            // The signature may have been already deserialized, just return it.
+            return it.symbol
         }
 
         var searchForSymbolKind = symbolKind
@@ -228,21 +229,25 @@ internal class KonanInteropModuleDeserializer(
             }
         }
 
-        return symbol
+        // If the deserialization process above found a declaration with the requested signature, it should store it in this map.
+        deserializedDeclarations[idSig]?.let {
+            return it.symbol
+        }
+
+        if (!declarationFqName.isOneSegmentFQN()) {
+            // If a member was not found inside a class, it may be because the signature actually refers to a fake override.
+            // F/Os are not present in Klib and will be created later, but the symbol for it must be created here.
+            when (symbolKind) {
+                BinarySymbolData.SymbolKind.FUNCTION_SYMBOL -> return symbolTable.referenceSimpleFunction(idSig)
+                BinarySymbolData.SymbolKind.PROPERTY_SYMBOL -> return symbolTable.referenceProperty(idSig)
+                else -> {}
+            }
+        }
+
+        return null
     }
 
     override fun deserializedSymbolNotFound(idSig: IdSignature): Nothing = error("No C-Interop symbol found for $idSig")
-
-    private fun SymbolTable.referenceSymbolByKind(idSig: IdSignature, symbolKind: BinarySymbolData.SymbolKind): IrSymbol? {
-        return when (symbolKind) {
-            BinarySymbolData.SymbolKind.CLASS_SYMBOL -> referenceClass(idSig)
-            BinarySymbolData.SymbolKind.CONSTRUCTOR_SYMBOL -> referenceConstructor(idSig)
-            BinarySymbolData.SymbolKind.FUNCTION_SYMBOL -> referenceSimpleFunction(idSig)
-            BinarySymbolData.SymbolKind.PROPERTY_SYMBOL -> referenceProperty(idSig)
-            BinarySymbolData.SymbolKind.ENUM_ENTRY_SYMBOL -> referenceEnumEntry(idSig)
-            else -> null
-        }
-    }
 
     private fun computeSignatureAndRegisterInSymbolTable(declaration: IrDeclarationWithName) {
         if (declaration is IrClass || declaration is IrEnumEntry) {
@@ -252,6 +257,7 @@ internal class KonanInteropModuleDeserializer(
         }
 
         val signature = signatureComputer.computeSignature(declaration)
+        deserializedDeclarations[signature] = declaration
         when (declaration) {
             is IrFunctionWithLateBinding -> symbolTable.declareSimpleFunction(
                     signature = signature,
@@ -359,6 +365,7 @@ internal class KonanInteropModuleDeserializer(
                     hasEnumEntries = kmClass.hasEnumEntries,
             )
         }
+        deserializedDeclarations[signature] = clazz
 
         clazz.annotations = kmClass.annotations.map { deserializeAnnotation(it) }
         clazz.superTypes = if (kmClass.supertypes.isNotEmpty()) {
@@ -421,6 +428,7 @@ internal class KonanInteropModuleDeserializer(
                     symbol = symbol,
             )
         }
+        deserializedDeclarations[signature] = enumEntry
 
         enumEntry.annotations = kmEnumEntry.annotations.map { deserializeAnnotation(it) }
 
