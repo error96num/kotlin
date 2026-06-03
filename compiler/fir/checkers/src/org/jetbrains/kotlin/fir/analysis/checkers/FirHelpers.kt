@@ -132,11 +132,12 @@ fun ConeKotlinType.isValueClass(session: FirSession): Boolean {
 }
 
 fun ConeKotlinType.isBasicSingleFieldValueClass(session: FirSession): Boolean = with(session.typeContext) {
-    getValueClassTypeRecursionType(session, checkExtendedValueClasses = false, checkMultiField = false) != null || typeConstructor().isInlineClass()
+    getValueClassTypeRecursionType(session, checkExtendedValueClasses = false, checkMultiField = false) != null ||
+            typeConstructor().isInlineClass()
 }
 
 fun ConeKotlinType.getValueClassTypeRecursionType(
-    session: FirSession, checkExtendedValueClasses: Boolean, checkMultiField: Boolean = true
+    session: FirSession, checkExtendedValueClasses: Boolean, checkMultiField: Boolean
 ): RecursionType? = getValueClassTypeRecursionType(hashSetOf(), session, checkExtendedValueClasses, checkMultiField)
 
 enum class RecursionType { Plain, ViaTypeParameters }
