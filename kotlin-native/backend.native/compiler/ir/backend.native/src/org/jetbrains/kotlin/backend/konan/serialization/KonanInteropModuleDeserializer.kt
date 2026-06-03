@@ -90,7 +90,6 @@ internal class KonanInteropModuleDeserializer(
     }
 
     private val symbolTable = linker.symbolTable
-    private val builtIns = linker.builtIns
     private val signatureComputer = PublicIdSignatureComputer(KonanManglerIr, markAllAsCInterop = true)
     private val metadataReader = KlibMetadataReader(klib)
     private val moduleHeaderProto: KlibMetadataProtoBuf.Header by lazy { parseModuleHeader(klib.metadata.moduleHeaderData) }
@@ -104,6 +103,40 @@ internal class KonanInteropModuleDeserializer(
     override val moduleFragment: IrModuleFragment = IrModuleFragmentImpl(moduleDescriptor)
     private var externalIrPackageFragment: IrExternalPackageFragment? = null
     private var typeDefinitionsIrFile: IrFile? = null
+
+    private val anyClass = symbolTable.referenceClass(StandardClassIds.Any.toIdSignature())
+    private val anyType = anyClass.defaultTypeWithoutArguments
+    private val unitClass = symbolTable.referenceClass(StandardClassIds.Unit.toIdSignature())
+    private val unitType = unitClass.defaultTypeWithoutArguments
+    private val booleanClass = symbolTable.referenceClass(StandardClassIds.Boolean.toIdSignature())
+    private val booleanType = booleanClass.defaultTypeWithoutArguments
+    private val charClass = symbolTable.referenceClass(StandardClassIds.Char.toIdSignature())
+    private val charType = charClass.defaultTypeWithoutArguments
+    private val byteClass = symbolTable.referenceClass(StandardClassIds.Byte.toIdSignature())
+    private val byteType = byteClass.defaultTypeWithoutArguments
+    private val shortClass = symbolTable.referenceClass(StandardClassIds.Short.toIdSignature())
+    private val shortType = shortClass.defaultTypeWithoutArguments
+    private val intClass = symbolTable.referenceClass(StandardClassIds.Int.toIdSignature())
+    private val intType = intClass.defaultTypeWithoutArguments
+    private val longClass = symbolTable.referenceClass(StandardClassIds.Long.toIdSignature())
+    private val longType = longClass.defaultTypeWithoutArguments
+    private val ubyteClass = symbolTable.referenceClass(StandardClassIds.UByte.toIdSignature())
+    private val ubyteType = ubyteClass.defaultTypeWithoutArguments
+    private val ushortClass = symbolTable.referenceClass(StandardClassIds.UShort.toIdSignature())
+    private val ushortType = ushortClass.defaultTypeWithoutArguments
+    private val uintClass = symbolTable.referenceClass(StandardClassIds.UInt.toIdSignature())
+    private val uintType = uintClass.defaultTypeWithoutArguments
+    private val ulongClass = symbolTable.referenceClass(StandardClassIds.ULong.toIdSignature())
+    private val ulongType = ulongClass.defaultTypeWithoutArguments
+    private val floatClass = symbolTable.referenceClass(StandardClassIds.Float.toIdSignature())
+    private val floatType = floatClass.defaultTypeWithoutArguments
+    private val doubleClass = symbolTable.referenceClass(StandardClassIds.Double.toIdSignature())
+    private val doubleType = doubleClass.defaultTypeWithoutArguments
+    private val stringClass = symbolTable.referenceClass(StandardClassIds.String.toIdSignature())
+    private val stringType = stringClass.defaultTypeWithoutArguments
+    private val arrayClass = symbolTable.referenceClass(StandardClassIds.Array.toIdSignature())
+    private val kClassClass = symbolTable.referenceClass(StandardClassIds.KClass.toIdSignature())
+
 
     private fun IdSignature.isInteropSignature() = IdSignature.Flags.IS_NATIVE_INTEROP_LIBRARY.test()
 
@@ -325,7 +358,7 @@ internal class KonanInteropModuleDeserializer(
         clazz.superTypes = if (kmClass.supertypes.isNotEmpty()) {
             kmClass.supertypes.map { it.toIrType() }
         } else {
-            listOf(builtIns.anyType)
+            listOf(anyType)
         }
         clazz.createThisReceiverParameter()
         clazz.parent = parent
@@ -396,7 +429,7 @@ internal class KonanInteropModuleDeserializer(
                 name = StandardNames.ENUM_VALUES,
                 visibility = DescriptorVisibilities.PUBLIC,
                 modality = Modality.FINAL,
-                returnType = builtIns.arrayClass.typeWith(enumClass.defaultType),
+                returnType = arrayClass.typeWith(enumClass.defaultType),
                 isExpect = false,
                 isInfix = false,
                 isExternal = false,
@@ -426,7 +459,7 @@ internal class KonanInteropModuleDeserializer(
         ).apply {
             addValueParameter {
                 name = Name.identifier("value")
-                type = builtIns.stringType
+                type = stringType
             }
             body = IrSyntheticBodyImpl(SYNTHETIC_OFFSET, SYNTHETIC_OFFSET, IrSyntheticBodyKind.ENUM_VALUEOF)
         }
@@ -574,7 +607,7 @@ internal class KonanInteropModuleDeserializer(
                 name = if (isSetter) Name.special("<set-${kmProperty.name}>") else Name.special("<get-${kmProperty.name}>"),
                 visibility = kmAccessor.visibility.toDescriptorVisibility(),
                 modality = kmAccessor.modality.toDescriptorModality(),
-                returnType = if (isSetter) builtIns.unitType else propertyType,
+                returnType = if (isSetter) unitType else propertyType,
                 isExpect = kmProperty.isExpect,
                 isInfix = false,
                 isExternal = kmAccessor.isExternal,
@@ -733,23 +766,23 @@ internal class KonanInteropModuleDeserializer(
 
     private fun deserializeAnnotationArgument(kmArgument: KmAnnotationArgument): IrExpression {
         return when (kmArgument) {
-            is KmAnnotationArgument.ByteValue -> IrConstImpl.byte(UNDEFINED_OFFSET, UNDEFINED_OFFSET, builtIns.byteType, kmArgument.value)
-            is KmAnnotationArgument.ShortValue -> IrConstImpl.short(UNDEFINED_OFFSET, UNDEFINED_OFFSET, builtIns.shortType, kmArgument.value)
-            is KmAnnotationArgument.IntValue -> IrConstImpl.int(UNDEFINED_OFFSET, UNDEFINED_OFFSET, builtIns.intType, kmArgument.value)
-            is KmAnnotationArgument.LongValue -> IrConstImpl.long(UNDEFINED_OFFSET, UNDEFINED_OFFSET, builtIns.longType, kmArgument.value)
-            is KmAnnotationArgument.UByteValue -> IrConstImpl.byte(UNDEFINED_OFFSET, UNDEFINED_OFFSET, builtIns.ubyteType, kmArgument.value.toByte())
-            is KmAnnotationArgument.UShortValue -> IrConstImpl.short(UNDEFINED_OFFSET, UNDEFINED_OFFSET, builtIns.ushortType, kmArgument.value.toShort())
-            is KmAnnotationArgument.UIntValue -> IrConstImpl.int(UNDEFINED_OFFSET, UNDEFINED_OFFSET, builtIns.uintType, kmArgument.value.toInt())
-            is KmAnnotationArgument.ULongValue -> IrConstImpl.long(UNDEFINED_OFFSET, UNDEFINED_OFFSET, builtIns.ulongType, kmArgument.value.toLong())
-            is KmAnnotationArgument.FloatValue -> IrConstImpl.float(UNDEFINED_OFFSET, UNDEFINED_OFFSET, builtIns.floatType, kmArgument.value)
-            is KmAnnotationArgument.DoubleValue -> IrConstImpl.double(UNDEFINED_OFFSET, UNDEFINED_OFFSET, builtIns.doubleType, kmArgument.value)
-            is KmAnnotationArgument.CharValue -> IrConstImpl.char(UNDEFINED_OFFSET, UNDEFINED_OFFSET, builtIns.charType, kmArgument.value)
-            is KmAnnotationArgument.BooleanValue -> IrConstImpl.boolean(UNDEFINED_OFFSET, UNDEFINED_OFFSET, builtIns.booleanType, kmArgument.value)
-            is KmAnnotationArgument.StringValue -> IrConstImpl.string(UNDEFINED_OFFSET, UNDEFINED_OFFSET, builtIns.stringType, kmArgument.value)
+            is KmAnnotationArgument.ByteValue -> IrConstImpl.byte(UNDEFINED_OFFSET, UNDEFINED_OFFSET, byteType, kmArgument.value)
+            is KmAnnotationArgument.ShortValue -> IrConstImpl.short(UNDEFINED_OFFSET, UNDEFINED_OFFSET, shortType, kmArgument.value)
+            is KmAnnotationArgument.IntValue -> IrConstImpl.int(UNDEFINED_OFFSET, UNDEFINED_OFFSET, intType, kmArgument.value)
+            is KmAnnotationArgument.LongValue -> IrConstImpl.long(UNDEFINED_OFFSET, UNDEFINED_OFFSET, longType, kmArgument.value)
+            is KmAnnotationArgument.UByteValue -> IrConstImpl.byte(UNDEFINED_OFFSET, UNDEFINED_OFFSET, ubyteType, kmArgument.value.toByte())
+            is KmAnnotationArgument.UShortValue -> IrConstImpl.short(UNDEFINED_OFFSET, UNDEFINED_OFFSET, ushortType, kmArgument.value.toShort())
+            is KmAnnotationArgument.UIntValue -> IrConstImpl.int(UNDEFINED_OFFSET, UNDEFINED_OFFSET, uintType, kmArgument.value.toInt())
+            is KmAnnotationArgument.ULongValue -> IrConstImpl.long(UNDEFINED_OFFSET, UNDEFINED_OFFSET, ulongType, kmArgument.value.toLong())
+            is KmAnnotationArgument.FloatValue -> IrConstImpl.float(UNDEFINED_OFFSET, UNDEFINED_OFFSET, floatType, kmArgument.value)
+            is KmAnnotationArgument.DoubleValue -> IrConstImpl.double(UNDEFINED_OFFSET, UNDEFINED_OFFSET, doubleType, kmArgument.value)
+            is KmAnnotationArgument.CharValue -> IrConstImpl.char(UNDEFINED_OFFSET, UNDEFINED_OFFSET, charType, kmArgument.value)
+            is KmAnnotationArgument.BooleanValue -> IrConstImpl.boolean(UNDEFINED_OFFSET, UNDEFINED_OFFSET, booleanType, kmArgument.value)
+            is KmAnnotationArgument.StringValue -> IrConstImpl.string(UNDEFINED_OFFSET, UNDEFINED_OFFSET, stringType, kmArgument.value)
             is KmAnnotationArgument.AnnotationValue -> deserializeAnnotation(kmArgument.annotation)
             is KmAnnotationArgument.KClassValue -> {
                 val classSymbol = findReferencedClass(kmArgument.className)
-                IrClassReferenceImpl(UNDEFINED_OFFSET, UNDEFINED_OFFSET, builtIns.kClassClass.starProjectedType, classSymbol, classSymbol.defaultTypeWithoutArguments)
+                IrClassReferenceImpl(UNDEFINED_OFFSET, UNDEFINED_OFFSET, kClassClass.starProjectedType, classSymbol, classSymbol.defaultTypeWithoutArguments)
             }
             is KmAnnotationArgument.ArrayKClassValue -> TODO("Unsupported annotation argument kind used inside C-interop Klib: Array class reference")
             is KmAnnotationArgument.EnumValue -> {
@@ -764,9 +797,12 @@ internal class KonanInteropModuleDeserializer(
             }
             is KmAnnotationArgument.ArrayValue -> {
                 val elements = kmArgument.elements.map { deserializeAnnotationArgument(it) }
-                val varargElementType = elements.mapToSetOrEmpty { it.type }.singleOrNull() ?: builtIns.anyType
-                val arrayType = builtIns.primitiveArrayForType[varargElementType]?.defaultTypeWithoutArguments
-                        ?: builtIns.arrayClass.typeWith(varargElementType)
+                val varargElementType = elements.mapToSetOrEmpty { it.type }.singleOrNull() ?: anyType
+                val arrayType = if (varargElementType.isPrimitiveType()) {
+                    val classId = ClassId.topLevel(varargElementType.classifierOrFail.fqNameWhenAvailable!!)
+                    val arrayClassId = StandardClassIds.primitiveArrayTypeByElementType[classId]!!
+                    symbolTable.referenceClass(arrayClassId.toIdSignature()).defaultTypeWithoutArguments
+                } else arrayClass.typeWith(varargElementType)
                 IrVarargImpl(UNDEFINED_OFFSET, UNDEFINED_OFFSET, arrayType, varargElementType, elements)
             }
         }

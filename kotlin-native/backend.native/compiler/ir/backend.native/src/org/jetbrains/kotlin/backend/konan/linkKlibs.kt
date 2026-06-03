@@ -195,7 +195,7 @@ internal fun LinkKlibsContext.linkKlibs(
 
     irDeserializer.postProcess(generatorContext.irBuiltIns, inOrAfterLinkageStep = true)
 
-    generateImplForCStructsAndEnums(irDeserializer, symbols)
+    generateImplForCStructsAndEnums(irDeserializer, generatorContext.irBuiltIns, symbols)
 
     // Enable lazy IR genration for newly-created symbols inside BE
     stubGenerator.unboundSymbolGeneration = true
@@ -258,8 +258,8 @@ private fun ensureCStructsAndEnumsAreLoadedForCaching(linker: KonanIrLinker, lib
     }
 }
 
-private fun generateImplForCStructsAndEnums(linker: KonanIrLinker, symbols: BackendNativeSymbols) {
-    val implGen = IrImplementationGeneratorForCStructsAndEnums(linker.builtIns, symbols)
+private fun generateImplForCStructsAndEnums(linker: KonanIrLinker, builtIns: IrBuiltIns, symbols: BackendNativeSymbols) {
+    val implGen = IrImplementationGeneratorForCStructsAndEnums(builtIns, symbols)
     for (module in linker.modules.values) {
         if (module.kotlinLibrary?.isCInteropLibrary() == true) {
             for (file in module.files) {
