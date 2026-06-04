@@ -72,7 +72,7 @@ index 27eebf63b..d0ddc3b3e 100644
 +                languageVersion.set(KotlinVersion.KOTLIN_2_0)
 +                apiVersion.set(KotlinVersion.KOTLIN_2_0)
 +                setProgressiveMode(false)
-+                logger.debug("Setting -api-version=1.9 and -language-version=1.9 in ${task}")
++                logger.debug("Setting -api-version=2.0 and -language-version=2.0 in ${task}")
 +            }
 +
 +         if (task instanceof KspTaskJvm) {
