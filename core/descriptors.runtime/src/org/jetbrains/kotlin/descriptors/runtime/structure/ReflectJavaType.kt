@@ -16,11 +16,13 @@
 
 package org.jetbrains.kotlin.descriptors.runtime.structure
 
+import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.load.java.structure.JavaType
 import java.lang.reflect.GenericArrayType
 import java.lang.reflect.Type
 import java.lang.reflect.WildcardType
 
+@K1Deprecation
 abstract class ReflectJavaType : JavaType {
     protected abstract val reflectType: Type
 

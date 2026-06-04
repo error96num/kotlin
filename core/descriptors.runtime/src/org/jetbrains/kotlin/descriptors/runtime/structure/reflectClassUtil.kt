@@ -16,6 +16,7 @@
 
 package org.jetbrains.kotlin.descriptors.runtime.structure
 
+import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
@@ -23,9 +24,11 @@ import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 import kotlin.reflect.KClass
 
+@K1Deprecation
 val Class<*>.safeClassLoader: ClassLoader
     get() = classLoader ?: ClassLoader.getSystemClassLoader()
 
+@K1Deprecation
 fun Class<*>.isEnumClassOrSpecializedEnumEntryClass(): Boolean =
     Enum::class.java.isAssignableFrom(this)
 
@@ -34,9 +37,11 @@ private val PRIMITIVE_CLASSES: List<KClass<*>> =
 private val WRAPPER_TO_PRIMITIVE: Map<Class<*>, Class<*>?> = PRIMITIVE_CLASSES.associate { it.javaObjectType to it.javaPrimitiveType }
 private val PRIMITIVE_TO_WRAPPER: Map<Class<*>?, Class<*>> = PRIMITIVE_CLASSES.associate { it.javaPrimitiveType to it.javaObjectType }
 
+@K1Deprecation
 val Class<*>.primitiveByWrapper: Class<*>?
     get() = WRAPPER_TO_PRIMITIVE[this]
 
+@K1Deprecation
 val Class<*>.wrapperByPrimitive: Class<*>?
     get() = PRIMITIVE_TO_WRAPPER[this]
 
@@ -49,12 +54,14 @@ private val FUNCTION_CLASSES =
         Function20::class.java, Function21::class.java, Function22::class.java
     ).mapIndexed { i, clazz -> clazz to i }.toMap()
 
+@K1Deprecation
 val Class<*>.functionClassArity: Int?
     get() = FUNCTION_CLASSES[this]
 
 /**
  * NOTE: does not perform a Java -> Kotlin mapping. If this is not expected, consider using KClassImpl#classId instead
  */
+@K1Deprecation
 val Class<*>.classId: ClassId
     get() = when {
         isPrimitive -> throw IllegalArgumentException("Can't compute ClassId for primitive type: $this")
@@ -66,6 +73,7 @@ val Class<*>.classId: ClassId
         else -> declaringClass?.classId?.createNestedClassId(Name.identifier(simpleName)) ?: ClassId.topLevel(FqName(name))
     }
 
+@K1Deprecation
 val Class<*>.desc: String
     get() = when {
         isPrimitive -> when (name) {
@@ -89,6 +97,7 @@ val Class<*>.desc: String
  * The returned list starts with the arguments to the innermost class, then continues with those of its outer class, and so on.
  * For example, for the type `Outer<A, B>.Inner<C, D>` the result would be `[C, D, A, B]`.
  */
+@K1Deprecation
 val Type.parameterizedTypeArguments: List<Type>
     get() {
         if (this !is ParameterizedType) return emptyList()

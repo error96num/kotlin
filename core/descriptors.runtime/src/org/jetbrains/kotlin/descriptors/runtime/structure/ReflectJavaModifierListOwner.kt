@@ -16,12 +16,14 @@
 
 package org.jetbrains.kotlin.descriptors.runtime.structure
 
+import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.descriptors.Visibilities
 import org.jetbrains.kotlin.descriptors.Visibility
 import org.jetbrains.kotlin.descriptors.java.JavaVisibilities
 import org.jetbrains.kotlin.load.java.structure.JavaModifierListOwner
 import java.lang.reflect.Modifier
 
+@K1Deprecation
 interface ReflectJavaModifierListOwner : JavaModifierListOwner {
     val modifiers: Int
 

@@ -16,9 +16,11 @@
 
 package org.jetbrains.kotlin.descriptors.runtime.structure
 
+import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.load.java.structure.JavaField
 import java.lang.reflect.Field
 
+@K1Deprecation
 class ReflectJavaField(override val member: Field) : ReflectJavaMember(), JavaField {
     override val isEnumEntry: Boolean
         get() = member.isEnumConstant

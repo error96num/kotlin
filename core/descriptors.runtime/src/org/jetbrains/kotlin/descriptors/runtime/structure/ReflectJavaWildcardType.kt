@@ -16,10 +16,12 @@
 
 package org.jetbrains.kotlin.descriptors.runtime.structure
 
+import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.load.java.structure.JavaAnnotation
 import org.jetbrains.kotlin.load.java.structure.JavaWildcardType
 import java.lang.reflect.WildcardType
 
+@K1Deprecation
 class ReflectJavaWildcardType(override val reflectType: WildcardType) : ReflectJavaType(), JavaWildcardType {
     override val bound: ReflectJavaType?
         get() {

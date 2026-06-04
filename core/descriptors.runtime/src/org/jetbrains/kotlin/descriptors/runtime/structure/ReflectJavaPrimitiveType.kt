@@ -16,11 +16,13 @@
 
 package org.jetbrains.kotlin.descriptors.runtime.structure
 
+import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.builtins.PrimitiveType
 import org.jetbrains.kotlin.load.java.structure.JavaAnnotation
 import org.jetbrains.kotlin.load.java.structure.JavaPrimitiveType
 import org.jetbrains.kotlin.resolve.jvm.JvmPrimitiveType
 
+@K1Deprecation
 class ReflectJavaPrimitiveType(override val reflectType: Class<*>) : ReflectJavaType(), JavaPrimitiveType {
     override val type: PrimitiveType?
         get() = if (reflectType == Void.TYPE)

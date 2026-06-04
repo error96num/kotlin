@@ -16,11 +16,13 @@
 
 package org.jetbrains.kotlin.descriptors.runtime.structure
 
+import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.load.java.structure.JavaTypeParameter
 import org.jetbrains.kotlin.name.Name
 import java.lang.reflect.AnnotatedElement
 import java.lang.reflect.TypeVariable
 
+@K1Deprecation
 class ReflectJavaTypeParameter(
     val typeVariable: TypeVariable<*>
 ) : ReflectJavaElement(), JavaTypeParameter, ReflectJavaAnnotationOwner {

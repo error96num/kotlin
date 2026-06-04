@@ -16,11 +16,13 @@
 
 package org.jetbrains.kotlin.descriptors.runtime.structure
 
+import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.load.java.structure.JavaAnnotation
 import org.jetbrains.kotlin.load.java.structure.JavaArrayType
 import java.lang.reflect.GenericArrayType
 import java.lang.reflect.Type
 
+@K1Deprecation
 class ReflectJavaArrayType(override val reflectType: Type) : ReflectJavaType(), JavaArrayType {
     override val componentType: ReflectJavaType = with(reflectType) {
         when {

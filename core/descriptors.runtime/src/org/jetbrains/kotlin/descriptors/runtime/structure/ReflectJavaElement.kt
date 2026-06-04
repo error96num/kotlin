@@ -16,6 +16,8 @@
 
 package org.jetbrains.kotlin.descriptors.runtime.structure
 
+import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.load.java.structure.JavaElement
 
+@K1Deprecation
 abstract class ReflectJavaElement : JavaElement

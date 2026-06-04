@@ -16,10 +16,12 @@
 
 package org.jetbrains.kotlin.descriptors.runtime.structure
 
+import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.load.java.structure.*
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.Name
 
+@K1Deprecation
 sealed class ReflectJavaAnnotationArgument(
     override val name: Name?
 ) : JavaAnnotationArgument {
@@ -36,11 +38,13 @@ sealed class ReflectJavaAnnotationArgument(
     }
 }
 
+@K1Deprecation
 class ReflectJavaLiteralAnnotationArgument(
     name: Name?,
     override val value: Any
 ) : ReflectJavaAnnotationArgument(name), JavaLiteralAnnotationArgument
 
+@K1Deprecation
 class ReflectJavaArrayAnnotationArgument(
     name: Name?,
     private val values: Array<*>
@@ -48,6 +52,7 @@ class ReflectJavaArrayAnnotationArgument(
     override fun getElements() = values.map { create(it!!, null) }
 }
 
+@K1Deprecation
 class ReflectJavaEnumValueAnnotationArgument(
     name: Name?,
     private val value: Enum<*>
@@ -63,6 +68,7 @@ class ReflectJavaEnumValueAnnotationArgument(
         get() = Name.identifier(value.name)
 }
 
+@K1Deprecation
 class ReflectJavaClassObjectAnnotationArgument(
     name: Name?,
     private val klass: Class<*>
@@ -70,6 +76,7 @@ class ReflectJavaClassObjectAnnotationArgument(
     override fun getReferencedType(): JavaType = ReflectJavaType.create(klass)
 }
 
+@K1Deprecation
 class ReflectJavaAnnotationAsAnnotationArgument(
     name: Name?,
     private val annotation: Annotation

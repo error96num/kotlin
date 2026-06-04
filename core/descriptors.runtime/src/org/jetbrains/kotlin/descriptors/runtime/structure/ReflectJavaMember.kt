@@ -16,6 +16,7 @@
 
 package org.jetbrains.kotlin.descriptors.runtime.structure
 
+import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.load.java.structure.JavaMember
 import org.jetbrains.kotlin.load.java.structure.JavaValueParameter
 import org.jetbrains.kotlin.name.Name
@@ -25,6 +26,7 @@ import java.lang.reflect.Member
 import java.lang.reflect.Method
 import java.lang.reflect.Type
 
+@K1Deprecation
 abstract class ReflectJavaMember : ReflectJavaElement(), ReflectJavaAnnotationOwner, ReflectJavaModifierListOwner, JavaMember {
     abstract val member: Member
 
@@ -69,6 +71,7 @@ abstract class ReflectJavaMember : ReflectJavaElement(), ReflectJavaAnnotationOw
     override fun toString() = this::class.java.name + ": " + member
 }
 
+@K1Deprecation
 object Java8ParameterNamesLoader {
     private class Cache(val getParameters: Method?, val getName: Method?)
 

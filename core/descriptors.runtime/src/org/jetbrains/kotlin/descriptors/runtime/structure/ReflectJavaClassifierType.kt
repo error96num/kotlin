@@ -16,6 +16,7 @@
 
 package org.jetbrains.kotlin.descriptors.runtime.structure
 
+import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.load.java.structure.JavaAnnotation
 import org.jetbrains.kotlin.load.java.structure.JavaClassifier
 import org.jetbrains.kotlin.load.java.structure.JavaClassifierType
@@ -25,6 +26,7 @@ import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 import java.lang.reflect.TypeVariable
 
+@K1Deprecation
 class ReflectJavaClassifierType(public override val reflectType: Type) : ReflectJavaType(), JavaClassifierType {
     override val classifier: JavaClassifier = run {
         val type = reflectType

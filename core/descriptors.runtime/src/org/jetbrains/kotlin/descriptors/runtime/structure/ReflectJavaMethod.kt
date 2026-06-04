@@ -16,12 +16,14 @@
 
 package org.jetbrains.kotlin.descriptors.runtime.structure
 
+import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.load.java.structure.JavaAnnotationArgument
 import org.jetbrains.kotlin.load.java.structure.JavaMethod
 import org.jetbrains.kotlin.load.java.structure.JavaValueParameter
 import java.lang.reflect.Method
 import java.lang.reflect.Modifier
 
+@K1Deprecation
 class ReflectJavaMethod(override val member: Method) : ReflectJavaMember(), JavaMethod {
     override val valueParameters: List<JavaValueParameter>
         get() = getValueParameters(member.genericParameterTypes, member.parameterAnnotations, member.isVarArgs)

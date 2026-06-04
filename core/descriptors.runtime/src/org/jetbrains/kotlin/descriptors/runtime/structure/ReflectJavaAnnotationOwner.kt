@@ -16,10 +16,12 @@
 
 package org.jetbrains.kotlin.descriptors.runtime.structure
 
+import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.load.java.structure.JavaAnnotationOwner
 import org.jetbrains.kotlin.name.FqName
 import java.lang.reflect.AnnotatedElement
 
+@K1Deprecation
 interface ReflectJavaAnnotationOwner : JavaAnnotationOwner {
     val element: AnnotatedElement?
 
@@ -33,10 +35,12 @@ interface ReflectJavaAnnotationOwner : JavaAnnotationOwner {
         get() = false
 }
 
+@K1Deprecation
 fun Array<Annotation>.getAnnotations(): List<ReflectJavaAnnotation> {
     return map(::ReflectJavaAnnotation)
 }
 
+@K1Deprecation
 fun Array<Annotation>.findAnnotation(fqName: FqName): ReflectJavaAnnotation? {
     return firstOrNull { it.annotationClass.java.classId.asSingleFqName() == fqName }?.let(::ReflectJavaAnnotation)
 }

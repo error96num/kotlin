@@ -5,11 +5,13 @@
 
 package org.jetbrains.kotlin.descriptors.runtime.structure
 
+import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.load.java.structure.JavaRecordComponent
 import org.jetbrains.kotlin.load.java.structure.JavaType
 import java.lang.reflect.Member
 import java.lang.reflect.Method
 
+@K1Deprecation
 class ReflectJavaRecordComponent(val recordComponent: Any) : ReflectJavaMember(), JavaRecordComponent {
     override val type: JavaType
         get() = Java16RecordComponentsLoader.loadGetType(recordComponent)?.let { ReflectJavaClassifierType(it) }

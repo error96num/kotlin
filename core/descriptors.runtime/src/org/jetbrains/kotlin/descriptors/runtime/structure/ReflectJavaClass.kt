@@ -16,6 +16,7 @@
 
 package org.jetbrains.kotlin.descriptors.runtime.structure
 
+import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.load.java.structure.JavaClass
 import org.jetbrains.kotlin.load.java.structure.JavaClassifierType
 import org.jetbrains.kotlin.load.java.structure.JavaRecordComponent
@@ -26,6 +27,7 @@ import java.lang.reflect.Member
 import java.lang.reflect.Method
 import java.util.*
 
+@K1Deprecation
 class ReflectJavaClass(
     private val klass: Class<*>
 ) : ReflectJavaElement(), ReflectJavaAnnotationOwner, ReflectJavaModifierListOwner, JavaClass {
@@ -146,6 +148,7 @@ class ReflectJavaClass(
     override fun toString() = this::class.java.name + ": " + klass
 }
 
+@K1Deprecation
 object Java16SealedRecordLoader {
     class Cache(
         val isSealed: Method?,

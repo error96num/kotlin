@@ -16,11 +16,13 @@
 
 package org.jetbrains.kotlin.descriptors.runtime.structure
 
+import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.load.java.structure.JavaConstructor
 import org.jetbrains.kotlin.load.java.structure.JavaValueParameter
 import java.lang.reflect.Constructor
 import java.lang.reflect.Modifier
 
+@K1Deprecation
 class ReflectJavaConstructor(override val member: Constructor<*>) : ReflectJavaMember(), JavaConstructor {
     // TODO: test local/anonymous classes
     override val valueParameters: List<JavaValueParameter>
