@@ -238,6 +238,8 @@ sealed class ClangArgs(
     /**
      * Should be used when compiling library for JNI.
      * For example, it is used for Kotlin/Native's Clang and LLVM libraries.
+     *
+     * Keep in sync with NativePlugin.kt
      */
     class Jni(configurables: Configurables) : ClangArgs(configurables, forJni = true) {
         private val jdkDir by lazy {

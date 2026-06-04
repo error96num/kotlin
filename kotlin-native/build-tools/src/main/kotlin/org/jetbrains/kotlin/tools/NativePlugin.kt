@@ -223,6 +223,7 @@ open class NativeToolsExtension(val project: Project) {
     val llvmDir by nativeDependenciesExtension::llvmPath
     val hostPlatform by nativeDependenciesExtension::hostPlatform
 
+    // Keep in sync with ClangArgs.kt
     private val jdkDir by lazy {
         val home = File(System.getProperty("java.home")).canonicalFile
         val parent = home.parentFile
