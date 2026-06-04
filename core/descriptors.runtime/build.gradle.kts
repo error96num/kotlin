@@ -25,6 +25,8 @@ sourceSets {
     "testFixtures" { projectDefault() }
 }
 
+optInToK1Deprecation()
+
 projectTests {
     testData(project(":compiler").isolated, "testData/loadJava")
     testData(project(":compiler").isolated, "testData/loadJava8")

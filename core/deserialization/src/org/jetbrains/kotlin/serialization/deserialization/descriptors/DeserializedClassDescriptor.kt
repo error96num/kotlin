@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.serialization.deserialization.descriptors
 
+import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.descriptors.impl.AbstractClassDescriptor
@@ -31,6 +32,7 @@ import org.jetbrains.kotlin.types.*
 import org.jetbrains.kotlin.types.checker.KotlinTypeRefiner
 import org.jetbrains.kotlin.utils.addToStdlib.flatMapToNullable
 
+@K1Deprecation
 class DeserializedClassDescriptor(
     outerContext: DeserializationContext,
     val classProto: ProtoBuf.Class,
