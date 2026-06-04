@@ -16,6 +16,7 @@
 
 package org.jetbrains.kotlin.wasm.resolve.diagnostics
 
+import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtDeclaration
@@ -25,6 +26,7 @@ import org.jetbrains.kotlin.resolve.checkers.DeclarationCheckerContext
 import org.jetbrains.kotlin.resolve.descriptorUtil.isEffectivelyExternal
 import org.jetbrains.kotlin.resolve.source.getPsi
 
+@K1Deprecation
 object WasmJsFunAnnotationChecker : DeclarationChecker {
     private val jsFunFqName = FqName("kotlin.JsFun")
 

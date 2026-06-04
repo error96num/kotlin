@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.wasm.resolve.diagnostics
 
+import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.js.resolve.diagnostics.findPsi
@@ -17,6 +18,7 @@ import org.jetbrains.kotlin.resolve.descriptorUtil.isEffectivelyExternal
 import org.jetbrains.kotlin.resolve.source.getPsi
 import org.jetbrains.kotlin.wasm.util.hasValidJsCodeBody
 
+@K1Deprecation
 abstract class WasmExportAnnotationChecker(val checkJsInterop: Boolean) : DeclarationChecker {
     private val wasmExportFqName = FqName("kotlin.wasm.WasmExport")
     private val jsExportFqName = FqName("kotlin.js.JsExport")
@@ -49,6 +51,8 @@ abstract class WasmExportAnnotationChecker(val checkJsInterop: Boolean) : Declar
     }
 }
 
+@K1Deprecation
 object WasmJsExportChecker : WasmExportAnnotationChecker(checkJsInterop = true)
 
+@K1Deprecation
 object WasmWasiExportChecker : WasmExportAnnotationChecker(checkJsInterop = false)

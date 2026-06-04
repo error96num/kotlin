@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.wasm.resolve
 
+import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.builtins.DefaultBuiltIns
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.resolve.*
@@ -12,6 +13,7 @@ import org.jetbrains.kotlin.resolve.*
 // TODO: Here for IDE ABI, remove after rename in IDE
 typealias WasmJsPlatformAnalyzerServices = WasmPlatformAnalyzerServices
 
+@K1Deprecation
 object WasmPlatformAnalyzerServices : PlatformDependentAnalyzerServices() {
     override val platformConfigurator: PlatformConfigurator = WasmJsPlatformConfigurator
     override val defaultImportsProvider: DefaultImportsProvider = WasmJsDefaultImportsProvider
@@ -20,6 +22,7 @@ object WasmPlatformAnalyzerServices : PlatformDependentAnalyzerServices() {
         get() = DefaultBuiltIns.Instance
 }
 
+@K1Deprecation
 object WasmWasiPlatformAnalyzerServices : PlatformDependentAnalyzerServices() {
     override val platformConfigurator: PlatformConfigurator = WasmWasiPlatformConfigurator
     override val defaultImportsProvider: DefaultImportsProvider = WasmWasiDefaultImportsProvider

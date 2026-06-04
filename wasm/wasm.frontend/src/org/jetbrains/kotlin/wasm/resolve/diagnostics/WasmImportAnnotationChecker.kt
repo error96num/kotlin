@@ -16,6 +16,7 @@
 
 package org.jetbrains.kotlin.wasm.resolve.diagnostics
 
+import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtDeclaration
@@ -33,6 +34,7 @@ import org.jetbrains.kotlin.types.typeUtil.isPrimitiveNumberType
 import org.jetbrains.kotlin.types.typeUtil.isUnit
 import org.jetbrains.kotlin.types.typeUtil.isUnsignedNumberType
 
+@K1Deprecation
 object WasmImportAnnotationChecker : DeclarationChecker {
     private val wasmImportFqName = FqName("kotlin.wasm.WasmImport")
 

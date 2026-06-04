@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.wasm.resolve
 
+import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.container.StorageComponentContainer
 import org.jetbrains.kotlin.container.useImpl
 import org.jetbrains.kotlin.container.useInstance
@@ -20,6 +21,7 @@ import org.jetbrains.kotlin.wasm.resolve.diagnostics.*
 // TODO: Review the list of used K/JS checkers.
 //       Refactor useful checkers into common module.
 //       KT-56848
+@K1Deprecation
 object WasmJsPlatformConfigurator : PlatformConfiguratorBase(
     additionalDeclarationCheckers = listOf(
         JsNameChecker, JsModuleChecker, JsExternalFileChecker,
@@ -64,6 +66,7 @@ object WasmJsPlatformConfigurator : PlatformConfiguratorBase(
 // TODO: Review the list of used K/JS checkers.
 //       Refactor useful checkers into common module.
 //       KT-56848
+@K1Deprecation
 object WasmWasiPlatformConfigurator : PlatformConfiguratorBase(
     additionalDeclarationCheckers = listOf(
         JsRuntimeAnnotationChecker,

@@ -17,6 +17,7 @@
 package org.jetbrains.kotlin.wasm.resolve.diagnostics
 
 import com.intellij.psi.PsiElement
+import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.descriptors.isTopLevelInPackage
@@ -34,6 +35,7 @@ import org.jetbrains.kotlin.resolve.constants.evaluate.ConstantExpressionEvaluat
 import org.jetbrains.kotlin.types.TypeUtils
 import org.jetbrains.kotlin.wasm.util.hasValidJsCodeBody
 
+@K1Deprecation
 class WasmJsCallChecker(
     private val constantExpressionEvaluator: ConstantExpressionEvaluator
 ) : CallChecker {

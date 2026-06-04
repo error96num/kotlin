@@ -5,10 +5,12 @@
 
 package org.jetbrains.kotlin.wasm.resolve
 
+import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.resolve.DefaultImportsProvider
 import org.jetbrains.kotlin.resolve.ImportPath
 
+@K1Deprecation
 object WasmJsDefaultImportsProvider : DefaultImportsProvider() {
     override val platformSpecificDefaultImports: List<ImportPath> = listOf(ImportPath.fromString("kotlin.js.*"))
 
@@ -16,6 +18,7 @@ object WasmJsDefaultImportsProvider : DefaultImportsProvider() {
         .map { FqName("kotlin.js.$it") }
 }
 
+@K1Deprecation
 object WasmWasiDefaultImportsProvider : DefaultImportsProvider() {
     override val platformSpecificDefaultImports: List<ImportPath> = listOf(ImportPath.fromString("kotlin.wasm.*"))
 }

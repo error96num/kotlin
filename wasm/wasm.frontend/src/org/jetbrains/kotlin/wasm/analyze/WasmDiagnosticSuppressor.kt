@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.wasm.analyze
 
+import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
@@ -16,6 +17,7 @@ import org.jetbrains.kotlin.resolve.checkers.PlatformDiagnosticSuppressor
 import org.jetbrains.kotlin.wasm.util.hasValidJsCodeBody
 
 
+@K1Deprecation
 object WasmDiagnosticSuppressor : PlatformDiagnosticSuppressor {
     override fun shouldReportUnusedParameter(parameter: VariableDescriptor, bindingContext: BindingContext): Boolean {
         val containingDeclaration = parameter.containingDeclaration
