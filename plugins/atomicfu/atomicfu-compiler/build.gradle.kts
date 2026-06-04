@@ -182,6 +182,8 @@ sourceSets {
     }
 }
 
+optInToK1Deprecation()
+
 testsJar()
 
 projectTests {
