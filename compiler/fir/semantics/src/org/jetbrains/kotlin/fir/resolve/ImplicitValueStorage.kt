@@ -127,6 +127,10 @@ class ImplicitValueStorage private constructor(
 
     fun receiversAsReversed(): List<ImplicitReceiverValue<*>> = implicitReceiverStack.asReversed()
 
+    fun ImplicitReceiverValue<*>.label(): Name? {
+        return this@ImplicitValueStorage.implicitReceiversByLabel.entries.find { it.value.contains(this@label) }?.key
+    }
+
     /**
      * Applies smart-casted type to an [ImplicitValue] identified by its [symbol].
      *
