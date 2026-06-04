@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2022 JetBrains s.r.o. and Kotlin Programming Language contributors.
+ * Copyright 2010-2026 JetBrains s.r.o. and Kotlin Programming Language contributors.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
  */
 
@@ -40,9 +40,6 @@ import com.intellij.psi.util.JavaClassSupers
 import com.intellij.util.io.URLUtil
 import org.jetbrains.annotations.TestOnly
 import org.jetbrains.kotlin.K1Deprecation
-import org.jetbrains.kotlin.asJava.KotlinAsJavaSupport
-import org.jetbrains.kotlin.asJava.LightClassGenerationSupport
-import org.jetbrains.kotlin.asJava.finder.JavaElementFinder
 import org.jetbrains.kotlin.cli.CliDiagnostics.COMPILER_PLUGIN_INITIALIZATION_ERROR
 import org.jetbrains.kotlin.cli.CliDiagnostics.COMPILER_PLUGIN_INITIALIZATION_WARNING
 import org.jetbrains.kotlin.cli.CliDiagnostics.INITIALIZATION_WARNING
@@ -75,7 +72,6 @@ import org.jetbrains.kotlin.load.kotlin.ModuleVisibilityManager
 import org.jetbrains.kotlin.load.kotlin.VirtualFileFinderFactory
 import org.jetbrains.kotlin.parsing.KotlinParserDefinition
 import org.jetbrains.kotlin.psi.KtFile
-import org.jetbrains.kotlin.resolve.CodeAnalyzerInitializer
 import org.jetbrains.kotlin.resolve.diagnostics.DiagnosticSuppressor
 import org.jetbrains.kotlin.resolve.extensions.AssignResolutionAltererExtension
 import org.jetbrains.kotlin.resolve.extensions.ExtraImportsProviderExtension
@@ -188,8 +184,6 @@ class KotlinCoreEnvironment private constructor(
                     CoreJavaFileManager::class.java,
                     this.getService(JavaFileManager::class.java) as CoreJavaFileManager
                 )
-
-                registerKotlinLightClassSupport(project)
 
                 registerService(ExternalAnnotationsManager::class.java, MockExternalAnnotationsManager())
                 registerService(InferredAnnotationsManager::class.java, MockInferredAnnotationsManager())
@@ -796,31 +790,6 @@ class KotlinCoreEnvironment private constructor(
              * Note that Kapt may restart code analysis process, and CLI services should be aware of that.
              * Use PsiManager.getModificationTracker() to ensure that all the data you cached is still valid.
              */
-        }
-
-        // made public for Android Lint
-        @JvmStatic
-        @K1Deprecation
-        fun registerKotlinLightClassSupport(project: MockProject) {
-            with(project) {
-                val traceHolder = CliTraceHolder(project)
-                val cliLightClassGenerationSupport = CliLightClassGenerationSupport(traceHolder, project)
-                val kotlinAsJavaSupport = CliKotlinAsJavaSupport(project, traceHolder)
-                registerService(LightClassGenerationSupport::class.java, cliLightClassGenerationSupport)
-                registerService(CliLightClassGenerationSupport::class.java, cliLightClassGenerationSupport)
-                registerService(KotlinAsJavaSupport::class.java, kotlinAsJavaSupport)
-                registerService(CodeAnalyzerInitializer::class.java, traceHolder)
-
-                // We don't pass Disposable because in some tests, we manually unregister these extensions, and that leads to LOG.error
-                // exception from `ExtensionPointImpl.doRegisterExtension`, because the registered extension can no longer be found
-                // when the project is being disposed.
-                // For example, see the `unregisterExtension` call in `GenerationUtils.compileFilesUsingFrontendIR`.
-                // TODO: refactor this to avoid registering unneeded extensions in the first place, and avoid using deprecated API. (KT-64296)
-                @Suppress("DEPRECATION")
-                PsiElementFinder.EP.getPoint(project).registerExtension(JavaElementFinder(this))
-                @Suppress("DEPRECATION")
-                PsiElementFinder.EP.getPoint(project).registerExtension(PsiElementFinderImpl(this))
-            }
         }
     }
 }
