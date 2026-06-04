@@ -280,7 +280,7 @@ internal class KaFe10ScopeProvider(
                 continue
             }
 
-            result += KaBaseScopeImplicitReceiverValue(type, owner, index)
+            result += KaBaseScopeImplicitReceiverValue(type, owner, index, null)
         }
 
         return result
