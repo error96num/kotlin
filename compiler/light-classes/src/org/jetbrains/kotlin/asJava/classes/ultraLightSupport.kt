@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.asJava.classes
 
+import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.codegen.state.KotlinTypeMapper
 import org.jetbrains.kotlin.config.LanguageVersionSettings
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
@@ -12,6 +13,7 @@ import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.resolve.deprecation.DeprecationResolver
 
+@K1Deprecation
 interface KtUltraLightSupport {
     val moduleName: String
     val deprecationResolver: DeprecationResolver

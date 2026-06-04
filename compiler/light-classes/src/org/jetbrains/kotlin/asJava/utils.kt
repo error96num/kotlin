@@ -7,6 +7,7 @@ package org.jetbrains.kotlin.asJava
 
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiModifierListOwner
+import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.asJava.classes.runReadAction
 import org.jetbrains.kotlin.asJava.elements.KtLightElement
 import org.jetbrains.kotlin.asJava.elements.KtLightElementBase
@@ -32,6 +33,7 @@ import org.jetbrains.kotlin.resolve.constants.ArrayValue
 import org.jetbrains.kotlin.resolve.constants.ConstantValue
 import org.jetbrains.kotlin.types.TypeUtils
 
+@K1Deprecation
 fun computeExpression(expression: PsiElement): Any? {
     fun evalConstantValue(constantValue: ConstantValue<*>): Any? =
         if (constantValue is ArrayValue) {
@@ -58,6 +60,7 @@ fun computeExpression(expression: PsiElement): Any? {
     return evalConstantValue(constant.toConstantValue(TypeUtils.NO_EXPECTED_TYPE))
 }
 
+@K1Deprecation
 fun fastCheckIsNullabilityApplied(lightElement: KtLightElement<*, PsiModifierListOwner>): Boolean {
     val elementIsApplicable = lightElement is KtLightMember<*> || lightElement is LightParameter
     if (!elementIsApplicable) return false

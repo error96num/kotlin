@@ -13,9 +13,11 @@ import com.intellij.psi.impl.PsiImplUtil
 import com.intellij.psi.util.PsiUtil
 import com.intellij.util.ArrayUtil
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
+import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.utils.addIfNotNull
 import java.util.*
 
+@K1Deprecation
 class KotlinClassInnerStuffCache(
     private val myClass: KtExtensibleLightClass,
     private val dependencies: List<Any>,

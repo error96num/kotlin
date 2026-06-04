@@ -12,6 +12,7 @@ import com.intellij.psi.util.CachedValueProvider
 import com.intellij.psi.util.CachedValuesManager
 import com.intellij.util.IncorrectOperationException
 import org.jetbrains.annotations.NotNull
+import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.asJava.elements.KtLightField
 import org.jetbrains.kotlin.asJava.elements.KtLightMethod
 import org.jetbrains.kotlin.asJava.toLightClass
@@ -24,6 +25,7 @@ import org.jetbrains.kotlin.psi.KtProperty
 import org.jetbrains.kotlin.psi.KtPropertyAccessor
 import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 
+@K1Deprecation
 class KtUltraLightClassForInterfaceDefaultImpls(classOrObject: KtClassOrObject, support: KtUltraLightSupport) :
     KtUltraLightClass(classOrObject, support) {
     override fun getQualifiedName(): String? = containingClass?.qualifiedName?.let { "$it.${JvmAbi.DEFAULT_IMPLS_CLASS_NAME}" }

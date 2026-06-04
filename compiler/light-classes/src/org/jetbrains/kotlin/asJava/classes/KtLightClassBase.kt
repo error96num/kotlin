@@ -12,10 +12,12 @@ import com.intellij.psi.PsiManager
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.impl.PsiClassImplUtil
 import com.intellij.psi.impl.light.AbstractLightClass
+import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.asJava.KotlinAsJavaSupportBase
 import org.jetbrains.kotlin.idea.KotlinLanguage
 import javax.swing.Icon
 
+@K1Deprecation
 abstract class KtLightClassBase protected constructor(
     manager: PsiManager
 ) : AbstractLightClass(manager, KotlinLanguage.INSTANCE), KtExtensibleLightClass {

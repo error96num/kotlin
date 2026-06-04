@@ -9,6 +9,7 @@ import com.intellij.psi.*
 import com.intellij.psi.impl.PsiImplUtil
 import com.intellij.psi.impl.compiled.ClsJavaCodeReferenceElementImpl
 import com.intellij.psi.impl.light.LightIdentifier
+import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.asJava.elements.KtLightAbstractAnnotation
 import org.jetbrains.kotlin.asJava.elements.KtLightElementBase
 import org.jetbrains.kotlin.asJava.elements.KtLightNullabilityAnnotation
@@ -21,6 +22,7 @@ import org.jetbrains.kotlin.resolve.constants.ArrayValue
 import org.jetbrains.kotlin.resolve.constants.ConstantValue
 import org.jetbrains.kotlin.resolve.constants.ErrorValue
 
+@K1Deprecation
 class KtUltraLightNullabilityAnnotation(
     member: KtUltraLightElementWithNullabilityAnnotation<*, *>,
     parent: PsiElement
@@ -28,15 +30,18 @@ class KtUltraLightNullabilityAnnotation(
     override fun getQualifiedName(): String? = member.qualifiedNameForNullabilityAnnotation
 }
 
+@K1Deprecation
 fun AnnotationDescriptor.toLightAnnotation(parent: PsiElement) = KtUltraLightSimpleAnnotation(
     fqName?.asString(),
     allValueArguments.map { it.key.asString() to it.value },
     parent,
 )
 
+@K1Deprecation
 fun DeclarationDescriptor.obtainLightAnnotations(parent: PsiElement): List<KtLightAbstractAnnotation> =
     annotations.map { it.toLightAnnotation(parent) }
 
+@K1Deprecation
 class KtUltraLightSimpleAnnotation(
     private val annotationFqName: String?,
     private val argumentsList: List<Pair<String, ConstantValue<*>>>,

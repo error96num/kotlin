@@ -7,9 +7,11 @@ package org.jetbrains.kotlin.asJava.classes
 
 import com.intellij.psi.PsiModifierListOwner
 import com.intellij.psi.PsiType
+import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.asJava.elements.KtLightDeclaration
 import org.jetbrains.kotlin.psi.KtDeclaration
 
+@K1Deprecation
 interface KtUltraLightElementWithNullabilityAnnotation<out T : KtDeclaration, out D : PsiModifierListOwner> : KtLightDeclaration<T, D>,
     PsiModifierListOwner {
 

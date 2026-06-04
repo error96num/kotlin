@@ -8,6 +8,7 @@ package org.jetbrains.kotlin.asJava.classes
 import com.intellij.psi.HierarchicalMethodSignature
 import com.intellij.psi.PsiElement
 import com.intellij.psi.impl.PsiSuperMethodImplUtil
+import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.asJava.elements.KtLightField
 import org.jetbrains.kotlin.asJava.elements.KtLightMethod
 import org.jetbrains.kotlin.lexer.KtTokens
@@ -15,6 +16,7 @@ import org.jetbrains.kotlin.psi.KtClassOrObject
 import org.jetbrains.kotlin.psi.KtNamedFunction
 import org.jetbrains.kotlin.psi.KtProperty
 
+@K1Deprecation
 class KtUltraLightInlineClass(
     classOrObject: KtClassOrObject,
     support: KtUltraLightSupport

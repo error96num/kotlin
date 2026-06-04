@@ -6,6 +6,7 @@
 package org.jetbrains.kotlin.asJava
 
 import com.intellij.openapi.project.Project
+import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.asJava.classes.*
 import org.jetbrains.kotlin.config.AnalysisFlags
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
@@ -17,6 +18,7 @@ import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.constants.evaluate.ConstantExpressionEvaluator
 import org.jetbrains.kotlin.resolve.lazy.descriptors.LazyClassDescriptor
 
+@K1Deprecation
 abstract class LightClassGenerationSupport {
     abstract fun resolveToDescriptor(declaration: KtDeclaration): DeclarationDescriptor?
 

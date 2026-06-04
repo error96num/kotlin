@@ -14,7 +14,9 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
+import org.jetbrains.kotlin.K1Deprecation
 
+@K1Deprecation
 class LightClassesLazyCreator(private val project: Project) : KotlinClassInnerStuffCache.LazyCreator() {
     override fun <T : Any> get(initializer: () -> T, dependencies: List<Any>) = object : Lazy<T> {
         private val lock = ReentrantLock()

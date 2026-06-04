@@ -13,6 +13,7 @@ import com.intellij.psi.stubs.IStubElementType
 import com.intellij.psi.stubs.StubElement
 import com.intellij.util.IncorrectOperationException
 import org.jetbrains.annotations.NonNls
+import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.asJava.elements.KtLightIdentifier
 import org.jetbrains.kotlin.config.JvmDefaultMode
 import org.jetbrains.kotlin.load.java.structure.LightClassOriginKind
@@ -21,6 +22,7 @@ import org.jetbrains.kotlin.psi.KtClassOrObject
 import org.jetbrains.kotlin.psi.debugText.getDebugText
 import org.jetbrains.kotlin.psi.stubs.KotlinClassOrObjectStub
 
+@K1Deprecation
 abstract class KtLightClassForSourceDeclaration(
     protected val classOrObject: KtClassOrObject,
     protected val jvmDefaultMode: JvmDefaultMode,
@@ -156,5 +158,6 @@ abstract class KtLightClassForSourceDeclaration(
     abstract fun isFinal(isFinalByPsi: Boolean): Boolean
 }
 
+@K1Deprecation
 fun KtLightClassForSourceDeclaration.isPossiblyAffectedByAllOpen() =
     !isAnnotationType && !isInterface && kotlinOrigin.annotationEntries.isNotEmpty()

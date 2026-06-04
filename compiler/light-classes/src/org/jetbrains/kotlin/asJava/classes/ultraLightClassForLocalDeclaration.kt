@@ -6,8 +6,10 @@
 package org.jetbrains.kotlin.asJava.classes
 
 import com.intellij.psi.PsiElement
+import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.psi.KtClassOrObject
 
+@K1Deprecation
 open class KtUltraLightClassForLocalDeclaration(
     classOrObject: KtClassOrObject,
     support: KtUltraLightSupport

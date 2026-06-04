@@ -7,10 +7,12 @@ package org.jetbrains.kotlin.asJava.classes
 
 import com.intellij.psi.*
 import com.intellij.psi.impl.InheritanceImplUtil
+import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.asJava.elements.KtLightIdentifier
 import org.jetbrains.kotlin.psi.KtClassOrObject
 import org.jetbrains.kotlin.resolve.DescriptorUtils
 
+@K1Deprecation
 open class KtUltraLightClassForAnonymousDeclaration(classOrObject: KtClassOrObject, support: KtUltraLightSupport) :
     KtUltraLightClassForLocalDeclaration(classOrObject, support), PsiAnonymousClass {
 

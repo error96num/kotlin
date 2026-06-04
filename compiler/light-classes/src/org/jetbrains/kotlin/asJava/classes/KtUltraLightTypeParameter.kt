@@ -10,11 +10,13 @@ import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiTypeParameterListOwner
 import com.intellij.psi.impl.light.LightReferenceListBuilder
 import com.intellij.psi.impl.light.LightTypeParameterBuilder
+import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.asJava.elements.PsiElementWithOrigin
 import org.jetbrains.kotlin.asJava.unwrapped
 import org.jetbrains.kotlin.psi.KtTypeParameter
 import org.jetbrains.kotlin.psi.KtTypeParameterListOwner
 
+@K1Deprecation
 class KtUltraLightTypeParameter(
     name: String,
     private val myOwner: PsiTypeParameterListOwner,

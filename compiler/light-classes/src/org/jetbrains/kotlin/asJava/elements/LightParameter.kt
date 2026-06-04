@@ -7,8 +7,10 @@ package org.jetbrains.kotlin.asJava.elements
 
 import com.intellij.lang.Language
 import com.intellij.psi.*
+import org.jetbrains.kotlin.K1Deprecation
 
 // Based on com.intellij.psi.impl.light.LightParameter
+@K1Deprecation
 open class LightParameter @JvmOverloads constructor(
     private val myName: String,
     type: PsiType,

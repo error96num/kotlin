@@ -10,12 +10,14 @@ import com.intellij.psi.impl.light.LightMethodBuilder
 import com.intellij.psi.impl.light.LightModifierList
 import com.intellij.psi.impl.light.LightParameterListBuilder
 import com.intellij.util.IncorrectOperationException
+import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.asJava.elements.*
 import org.jetbrains.kotlin.asJava.toLightClass
 import org.jetbrains.kotlin.builtins.StandardNames
 import org.jetbrains.kotlin.load.java.JvmAbi
 import org.jetbrains.kotlin.psi.KtClassOrObject
 
+@K1Deprecation
 class KtUltraLightClassForRepeatableAnnotationContainer(classOrObject: KtClassOrObject, support: KtUltraLightSupport) :
     KtUltraLightClass(classOrObject, support) {
     override fun getQualifiedName(): String? = containingClass?.qualifiedName?.let { "$it.${JvmAbi.REPEATABLE_ANNOTATION_CONTAINER_NAME}" }

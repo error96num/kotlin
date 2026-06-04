@@ -11,11 +11,13 @@ import com.intellij.psi.PsiIdentifier
 import com.intellij.psi.PsiLiteralExpression
 import com.intellij.psi.PsiNameValuePair
 import com.intellij.psi.impl.light.LightIdentifier
+import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.asJava.classes.cannotModify
 import org.jetbrains.kotlin.asJava.classes.lazyPub
 import org.jetbrains.kotlin.psi.KtElement
 import kotlin.getValue
 
+@K1Deprecation
 class KtLightPsiNameValuePair(
     override val kotlinOrigin: KtElement,
     private val name: String,

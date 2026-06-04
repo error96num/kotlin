@@ -9,6 +9,7 @@ import com.intellij.psi.*
 import com.intellij.psi.util.PsiTreeUtil
 import org.jetbrains.annotations.NotNull
 import org.jetbrains.annotations.Nullable
+import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.asJava.LightClassGenerationSupport
 import org.jetbrains.kotlin.asJava.classes.cannotModify
 import org.jetbrains.kotlin.asJava.classes.lazyPub
@@ -40,6 +41,7 @@ import org.jetbrains.kotlin.types.typeUtil.isTypeParameter
 import org.jetbrains.kotlin.types.typeUtil.isUnit
 import org.jetbrains.kotlin.types.typeUtil.nullability
 
+@K1Deprecation
 class KtLightAnnotationForSourceEntry(
     private val name: String?,
     private val lazyQualifiedName: () -> String?,
@@ -210,11 +212,13 @@ class KtLightAnnotationForSourceEntry(
     override fun <T : PsiAnnotationMemberValue?> setDeclaredAttributeValue(attributeName: String?, value: T?) = cannotModify()
 }
 
+@K1Deprecation
 class KtLightEmptyAnnotationParameterList(parent: PsiElement) : KtLightElementBase(parent), PsiAnnotationParameterList {
     override val kotlinOrigin: KtElement? get() = null
     override fun getAttributes(): Array<PsiNameValuePair> = emptyArray()
 }
 
+@K1Deprecation
 open class KtLightNullabilityAnnotation<D : KtLightElement<*, PsiModifierListOwner>>(val member: D, parent: PsiElement) :
     KtLightAbstractAnnotation(parent) {
     override fun fqNameMatches(fqName: String): Boolean {
@@ -325,6 +329,7 @@ private fun KtElement.getResolvedCall(): ResolvedCall<out CallableDescriptor>? {
     return this.getResolvedCall(context)
 }
 
+@K1Deprecation
 fun convertToLightAnnotationMemberValue(lightParent: PsiElement, argument: KtExpression): PsiAnnotationMemberValue {
     @Suppress("NAME_SHADOWING") val argument = unwrapCall(argument)
     when (argument) {

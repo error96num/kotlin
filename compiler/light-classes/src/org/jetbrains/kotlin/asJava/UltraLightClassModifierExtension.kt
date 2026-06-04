@@ -6,6 +6,7 @@
 package org.jetbrains.kotlin.asJava
 
 import com.intellij.psi.PsiModifier
+import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.asJava.classes.KtUltraLightClass
 import org.jetbrains.kotlin.asJava.elements.KtLightField
 import org.jetbrains.kotlin.asJava.elements.KtLightMethod
@@ -13,6 +14,7 @@ import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.extensions.ProjectExtensionDescriptor
 import org.jetbrains.kotlin.psi.KtDeclaration
 
+@K1Deprecation
 interface UltraLightClassModifierExtension {
 
     companion object : ProjectExtensionDescriptor<UltraLightClassModifierExtension>(

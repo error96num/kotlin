@@ -9,10 +9,12 @@ import com.intellij.psi.JavaElementVisitor
 import com.intellij.psi.PsiElementVisitor
 import com.intellij.psi.PsiParameter
 import com.intellij.psi.PsiParameterList
+import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.asJava.classes.lazyPub
 import org.jetbrains.kotlin.psi.KtElement
 import org.jetbrains.kotlin.psi.KtFunction
 
+@K1Deprecation
 class KtLightParameterList(
     private val parent: KtLightMethod,
     private val parametersCount: Int,

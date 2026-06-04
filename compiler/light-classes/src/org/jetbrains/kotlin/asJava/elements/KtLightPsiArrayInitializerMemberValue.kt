@@ -8,8 +8,10 @@ package org.jetbrains.kotlin.asJava.elements
 import com.intellij.psi.PsiAnnotationMemberValue
 import com.intellij.psi.PsiArrayInitializerMemberValue
 import com.intellij.psi.PsiElement
+import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.psi.KtElement
 
+@K1Deprecation
 class KtLightPsiArrayInitializerMemberValue(
     override val kotlinOrigin: KtElement,
     private val lightParent: PsiElement,

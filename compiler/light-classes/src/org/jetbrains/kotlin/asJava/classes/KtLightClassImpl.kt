@@ -8,6 +8,7 @@ package org.jetbrains.kotlin.asJava.classes
 import com.intellij.psi.*
 import com.intellij.psi.impl.InheritanceImplUtil
 import com.intellij.psi.scope.PsiScopeProcessor
+import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.asJava.LightClassGenerationSupport
 import org.jetbrains.kotlin.asJava.elements.FakeFileForLightClass
 import org.jetbrains.kotlin.asJava.hasInterfaceDefaultImpls
@@ -26,6 +27,7 @@ import org.jetbrains.kotlin.psi.KtEnumEntry
 import org.jetbrains.kotlin.resolve.DescriptorUtils
 
 // light class for top level or (inner/nested of top level) source declarations
+@K1Deprecation
 abstract class KtLightClassImpl(
     classOrObject: KtClassOrObject,
     jvmDefaultMode: JvmDefaultMode,

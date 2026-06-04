@@ -8,6 +8,7 @@ package org.jetbrains.kotlin.asJava.classes
 import com.intellij.psi.PsiModifierListOwner
 import com.intellij.psi.PsiPrimitiveType
 import com.intellij.psi.PsiType
+import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.load.java.JvmAnnotationNames
 import org.jetbrains.kotlin.psi.KtDeclaration
 import org.jetbrains.kotlin.types.KotlinType
@@ -17,6 +18,7 @@ import org.jetbrains.kotlin.types.typeUtil.TypeNullability
 import org.jetbrains.kotlin.types.typeUtil.isTypeParameter
 import org.jetbrains.kotlin.types.typeUtil.nullability
 
+@K1Deprecation
 interface KtUltraLightElementWithNullabilityAnnotationDescriptorBased<T : KtDeclaration, D : PsiModifierListOwner> :
     KtUltraLightElementWithNullabilityAnnotation<T, D> {
 
@@ -25,6 +27,7 @@ interface KtUltraLightElementWithNullabilityAnnotationDescriptorBased<T : KtDecl
     }
 }
 
+@K1Deprecation
 fun computeNullabilityQualifier(kotlinType: KotlinType?, psiType: PsiType?): String? {
     if (psiType == null || psiType is PsiPrimitiveType) return null
 

@@ -22,6 +22,7 @@ import com.intellij.psi.util.TypeConversionUtil
 import com.intellij.util.BitUtil.isSet
 import com.intellij.util.IncorrectOperationException
 import com.intellij.util.containers.ContainerUtil
+import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.asJava.KotlinAsJavaSupportBase
 import org.jetbrains.kotlin.asJava.LightClassGenerationSupport
 import org.jetbrains.kotlin.asJava.UltraLightClassModifierExtension
@@ -167,6 +168,7 @@ internal fun KotlinType.asPsiType(
     typeMapper.mapType(this, signatureWriter, mode)
 }
 
+@K1Deprecation
 fun annotateByKotlinType(
     psiType: PsiType,
     kotlinType: KotlinType,
@@ -231,6 +233,7 @@ private fun createTypeFromCanonicalText(
     return type
 }
 
+@K1Deprecation
 fun tryGetPredefinedName(klass: ClassDescriptor): String? {
     val sourceClass = (klass.source as? KotlinSourceElement)?.psi as? KtClassOrObject
 
@@ -240,6 +243,7 @@ fun tryGetPredefinedName(klass: ClassDescriptor): String? {
 }
 
 // Returns null when type is unchanged
+@K1Deprecation
 fun KotlinType.cleanFromAnonymousTypes(): KotlinType? {
     val returnTypeClass = constructor.declarationDescriptor as? ClassDescriptor ?: return null
     if (DescriptorUtils.isAnonymousObject(returnTypeClass)) {
@@ -271,6 +275,7 @@ fun KotlinType.cleanFromAnonymousTypes(): KotlinType? {
     return replace(newArguments = newArguments)
 }
 
+@K1Deprecation
 fun KtUltraLightClass.createGeneratedMethodFromDescriptor(
     descriptor: FunctionDescriptor,
     declarationOriginKindForOrigin: JvmDeclarationOriginKind = JvmDeclarationOriginKind.OTHER,
@@ -368,6 +373,7 @@ internal fun KtModifierListOwner.isHiddenByDeprecation(support: KtUltraLightSupp
     }
 }
 
+@K1Deprecation
 fun KtAnnotationEntry.looksLikeDeprecated(): Boolean {
     val arguments = valueArguments.filterIsInstance<KtValueArgument>().filterIndexed { index, valueArgument ->
         index == 2 || valueArgument.looksLikeLevelArgument() // for named/not named arguments
@@ -389,6 +395,7 @@ fun KtAnnotationEntry.looksLikeDeprecated(): Boolean {
     return false
 }
 
+@K1Deprecation
 fun KtValueArgument.looksLikeLevelArgument(): Boolean {
     return children.filterIsInstance<KtValueArgumentName>().any { it.asName.asString() == "level" }
 }
@@ -487,11 +494,13 @@ internal inline fun Project.applyCompilerPlugins(body: (UltraLightClassModifierE
     UltraLightClassModifierExtension.getInstances(this).forEach { body(it) }
 }
 
+@K1Deprecation
 inline fun <T> runReadAction(crossinline runnable: () -> T): T {
     return ApplicationManager.getApplication().runReadAction(Computable { runnable() })
 }
 
 @Suppress("NOTHING_TO_INLINE")
+@K1Deprecation
 inline fun KtClassOrObject.safeIsLocal(): Boolean = runReadAction { this.isLocal }
 
 internal fun KtUltraLightSupport.findAnnotation(owner: KtAnnotated, fqName: FqName): Pair<KtAnnotationEntry, AnnotationDescriptor>? {

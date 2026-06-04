@@ -10,11 +10,13 @@ import com.intellij.psi.PsiIdentifier
 import com.intellij.psi.PsiMember
 import com.intellij.psi.PsiModifierList
 import com.intellij.psi.javadoc.PsiDocComment
+import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.asJava.builder.LightMemberOriginForDeclaration
 import org.jetbrains.kotlin.asJava.classes.KtLightClass
 import org.jetbrains.kotlin.psi.KtDeclaration
 import org.jetbrains.kotlin.psi.KtNamedDeclaration
 
+@K1Deprecation
 abstract class KtLightMemberImpl<out D : PsiMember>(
     override val lightMemberOrigin: LightMemberOriginForDeclaration?,
     private val containingClass: KtLightClass,

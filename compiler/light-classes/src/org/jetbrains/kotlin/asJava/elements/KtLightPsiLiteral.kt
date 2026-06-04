@@ -7,6 +7,7 @@ package org.jetbrains.kotlin.asJava.elements
 
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.psi.*
+import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.asJava.LightClassGenerationSupport
 import org.jetbrains.kotlin.asJava.computeExpression
 import org.jetbrains.kotlin.psi.KtExpression
@@ -14,6 +15,7 @@ import org.jetbrains.kotlin.psi.KtPsiFactory
 import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 
+@K1Deprecation
 open class KtLightPsiLiteral(
     override val kotlinOrigin: KtExpression,
     private val lightParent: PsiElement

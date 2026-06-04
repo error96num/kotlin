@@ -10,6 +10,7 @@ package org.jetbrains.kotlin.asJava.elements
 import com.intellij.psi.CommonClassNames
 import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiModifierListOwner
+import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.asJava.LightClassGenerationSupport
 import org.jetbrains.kotlin.asJava.builder.LightMemberOriginForDeclaration
 import org.jetbrains.kotlin.asJava.classes.KtLightClassForSourceDeclaration
@@ -27,6 +28,7 @@ import org.jetbrains.kotlin.psi.psiUtil.isPropertyParameter
 import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.source.getPsi
 
+@K1Deprecation
 abstract class KtLightModifierListDescriptorBased<out T : KtLightElement<KtModifierListOwner, PsiModifierListOwner>>(owner: T) :
     KtLightModifierList<T>(owner) {
     override fun computeAnnotations(): List<KtLightAbstractAnnotation> {
@@ -65,6 +67,7 @@ abstract class KtLightModifierListDescriptorBased<out T : KtLightElement<KtModif
     }
 }
 
+@K1Deprecation
 class KtUltraLightSimpleModifierList(
     owner: KtLightElement<KtModifierListOwner, PsiModifierListOwner>,
     private val modifiers: Set<String>,
@@ -74,6 +77,7 @@ class KtUltraLightSimpleModifierList(
     override fun copy() = KtUltraLightSimpleModifierList(owner, modifiers)
 }
 
+@K1Deprecation
 abstract class KtUltraLightModifierList<out T : KtLightElement<KtModifierListOwner, PsiModifierListOwner>>(
     owner: T,
     protected val support: KtUltraLightSupport
@@ -132,6 +136,7 @@ private fun lightAnnotationsForEntries(lightModifierList: KtLightModifierList<*>
         }
 }
 
+@K1Deprecation
 fun isFromSources(lightElement: KtLightElement<*, *>): Boolean {
     if (lightElement is KtLightClassForSourceDeclaration) return true
     if (lightElement.parent is KtLightClassForSourceDeclaration) return true

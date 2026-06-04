@@ -11,11 +11,13 @@ import com.intellij.psi.impl.light.LightEmptyImplementsList
 import com.intellij.psi.impl.light.LightModifierList
 import com.intellij.util.IncorrectOperationException
 import org.jetbrains.annotations.NonNls
+import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.asJava.elements.FakeFileForLightClass
 import org.jetbrains.kotlin.idea.KotlinLanguage
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtScript
 
+@K1Deprecation
 abstract class KtLightClassForScriptBase(
     override val script: KtScript
 ) : KtLightClassForScript, KtLightClassBase(script.manager) {

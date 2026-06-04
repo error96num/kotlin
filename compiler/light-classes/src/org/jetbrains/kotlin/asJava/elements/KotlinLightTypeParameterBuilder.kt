@@ -7,9 +7,11 @@ package org.jetbrains.kotlin.asJava.elements
 
 import com.intellij.psi.PsiTypeParameterListOwner
 import com.intellij.psi.impl.light.LightTypeParameterBuilder
+import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.psi.KtTypeParameter
 
 @Suppress("unused") // Used by UastFakeSourceLightMethod
+@K1Deprecation
 open class KotlinLightTypeParameterBuilder(
     name: String,
     owner: PsiTypeParameterListOwner,

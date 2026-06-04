@@ -9,8 +9,10 @@ import com.intellij.openapi.util.TextRange
 import com.intellij.psi.*
 import com.intellij.psi.scope.PsiScopeProcessor
 import com.intellij.util.IncorrectOperationException
+import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.asJava.classes.lazyPub
 
+@K1Deprecation
 class KtLightPsiJavaCodeReferenceElement(
     private val ktElement: PsiElement,
     reference: () -> PsiReference?,
