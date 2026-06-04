@@ -25,3 +25,5 @@ sourceSets {
     "test" { none() }
     "testFixtures" { projectDefault() }
 }
+
+optInToK1Deprecation()
