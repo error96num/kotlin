@@ -17,10 +17,12 @@
 package org.jetbrains.kotlin.js.resolve.diagnostics
 
 import com.intellij.psi.PsiElement
+import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.diagnostics.rendering.DiagnosticParameterRenderer
 import org.jetbrains.kotlin.diagnostics.rendering.RenderingContext
 import org.jetbrains.kotlin.js.parser.isEndOfLine
 
+@K1Deprecation
 object RenderFirstLineOfElementText : DiagnosticParameterRenderer<PsiElement> {
     override fun render(obj: PsiElement, renderingContext: RenderingContext): String {
         val text = obj.text
@@ -29,6 +31,7 @@ object RenderFirstLineOfElementText : DiagnosticParameterRenderer<PsiElement> {
     }
 }
 
+@K1Deprecation
 abstract class JsCallDataRenderer : DiagnosticParameterRenderer<JsCallData> {
     protected abstract fun format(data: JsCallDataWithCode): String
 
@@ -39,6 +42,7 @@ abstract class JsCallDataRenderer : DiagnosticParameterRenderer<JsCallData> {
         }
 }
 
+@K1Deprecation
 object JsCallDataTextRenderer : JsCallDataRenderer() {
     override fun format(data: JsCallDataWithCode): String {
         val codeRange = data.codeRange
@@ -48,6 +52,7 @@ object JsCallDataTextRenderer : JsCallDataRenderer() {
 }
 
 @Suppress("unused") // Used from the Kotlin IntelliJ plugin
+@K1Deprecation
 object JsCallDataHtmlRenderer : JsCallDataRenderer() {
     override fun format(data: JsCallDataWithCode): String {
         val codeRange = data.codeRange
@@ -63,6 +68,7 @@ object JsCallDataHtmlRenderer : JsCallDataRenderer() {
  * var  = 10;
  *    ^^^^
  */
+@K1Deprecation
 fun String.underlineAsText(from: Int, to: Int): String {
     val lines = StringBuilder()
     var marks = StringBuilder()
@@ -99,6 +105,7 @@ fun String.underlineAsText(from: Int, to: Int): String {
     return lines.toString()
 }
 
+@K1Deprecation
 fun String.underlineAsHtml(from: Int, to: Int): String {
     val lines = StringBuilder()
     var openMarker = false

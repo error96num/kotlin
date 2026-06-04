@@ -16,6 +16,7 @@
 
 package org.jetbrains.kotlin.js.analyze
 
+import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.VariableDescriptor
@@ -35,6 +36,7 @@ private fun DeclarationDescriptor.isLexicallyInsideJsNative(): Boolean {
     return false
 }
 
+@K1Deprecation
 object JsNativeDiagnosticSuppressor : PlatformDiagnosticSuppressor {
     override fun shouldReportUnusedParameter(parameter: VariableDescriptor, bindingContext: BindingContext): Boolean =
         !parameter.isLexicallyInsideJsNative()

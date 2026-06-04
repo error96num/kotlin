@@ -16,6 +16,7 @@
 
 package org.jetbrains.kotlin.js.resolve.diagnostics
 
+import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.js.parser.AbortParsingException
 import org.jetbrains.kotlin.js.parser.CodePosition
 import org.jetbrains.kotlin.js.parser.ErrorReporter
@@ -47,6 +48,7 @@ import org.jetbrains.kotlin.resolve.constants.TypedCompileTimeConstant
 import org.jetbrains.kotlin.resolve.constants.evaluate.ConstantExpressionEvaluator
 import org.jetbrains.kotlin.types.TypeUtils
 
+@K1Deprecation
 class JsCallChecker(
         private val constantExpressionEvaluator: ConstantExpressionEvaluator
 ) : CallChecker {
@@ -118,6 +120,7 @@ class JsCallChecker(
     }
 }
 
+@K1Deprecation
 class JsCodeErrorReporter(
         private val nodeToReport: KtExpression,
         private val code: String,
@@ -164,8 +167,10 @@ class JsCodeErrorReporter(
 private val KtExpression.isConstantStringLiteral: Boolean
     get() = this is KtStringTemplateExpression && entries.all { it is KtLiteralStringTemplateEntry }
 
+@K1Deprecation
 open class JsCallData(val reportRange: TextRange, val message: String)
 
+@K1Deprecation
 class JsCallDataWithCode(
         reportRange: TextRange,
         message: String,

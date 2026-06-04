@@ -16,6 +16,7 @@
 
 package org.jetbrains.kotlin.js.naming
 
+import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.builtins.isSuspendFunctionType
 import org.jetbrains.kotlin.descriptors.*
@@ -25,6 +26,7 @@ import org.jetbrains.kotlin.types.TypeProjection
 import org.jetbrains.kotlin.types.Variance
 import org.jetbrains.kotlin.types.typeUtil.getEffectiveVariance
 
+@K1Deprecation
 fun encodeSignature(descriptor: CallableDescriptor): String {
     val sig = StringBuilder()
 

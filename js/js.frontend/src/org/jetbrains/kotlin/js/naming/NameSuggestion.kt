@@ -16,6 +16,7 @@
 
 package org.jetbrains.kotlin.js.naming
 
+import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.builtins.ReflectionTypes
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.descriptors.impl.TypeAliasConstructorDescriptor
@@ -34,8 +35,10 @@ import org.jetbrains.kotlin.resolve.descriptorUtil.isEnumValueOfMethod
 import java.util.*
 import kotlin.math.abs
 
+@K1Deprecation
 class JsNameSuggestion : NameSuggestion()
 
+@K1Deprecation
 class WasmNameSuggestion : NameSuggestion()
 
 /**
@@ -47,6 +50,7 @@ class WasmNameSuggestion : NameSuggestion()
  * A new instance of this class can be created for each request, however, it's recommended to use stable instance, since
  * [NameSuggestion] supports caching.
  */
+@K1Deprecation
 open class NameSuggestion {
     private val cache: MutableMap<DeclarationDescriptor, SuggestedName?> = Collections.synchronizedMap(WeakHashMap())
 

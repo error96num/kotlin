@@ -16,6 +16,7 @@
 
 package org.jetbrains.kotlin.js.resolve
 
+import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.psi.KtCallableDeclaration
@@ -23,6 +24,7 @@ import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.descriptorUtil.isEffectivelyExternal
 import org.jetbrains.kotlin.resolve.inline.ReasonableInlineRule
 
+@K1Deprecation
 object ExtensionFunctionToExternalIsInlinable : ReasonableInlineRule {
     override fun isInlineReasonable(
             descriptor: CallableMemberDescriptor,

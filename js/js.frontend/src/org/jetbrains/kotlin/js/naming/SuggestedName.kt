@@ -16,6 +16,8 @@
 
 package org.jetbrains.kotlin.js.naming
 
+import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 
+@K1Deprecation
 class SuggestedName(val names: List<String>, val stable: Boolean, val descriptor: DeclarationDescriptor, val scope: DeclarationDescriptor)

@@ -5,6 +5,9 @@
 
 package org.jetbrains.kotlin.js.config
 
+import org.jetbrains.kotlin.K1Deprecation
+
+@K1Deprecation
 enum class RuntimeDiagnostic {
     LOG,
     EXCEPTION;

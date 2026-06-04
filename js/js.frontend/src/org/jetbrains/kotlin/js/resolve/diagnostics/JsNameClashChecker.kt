@@ -16,6 +16,7 @@
 
 package org.jetbrains.kotlin.js.resolve.diagnostics
 
+import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.config.LanguageVersionSettings
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.diagnostics.DiagnosticSink
@@ -36,6 +37,7 @@ import org.jetbrains.kotlin.resolve.descriptorUtil.isExtensionProperty
 import org.jetbrains.kotlin.resolve.scopes.MemberScope
 import org.jetbrains.kotlin.types.checker.KotlinTypeRefiner
 
+@K1Deprecation
 class JsNameClashChecker(
     nameSuggestion: JsNameSuggestion,
     languageVersionSettings: LanguageVersionSettings,
@@ -46,6 +48,7 @@ class JsNameClashChecker(
     kotlinTypeRefiner,
 )
 
+@K1Deprecation
 class WasmNameClashChecker(
     nameSuggestion: WasmNameSuggestion,
     languageVersionSettings: LanguageVersionSettings,
@@ -56,6 +59,7 @@ class WasmNameClashChecker(
     kotlinTypeRefiner,
 )
 
+@K1Deprecation
 abstract class AbstractNameClashChecker(
     private val nameSuggestion: NameSuggestion,
     private val languageVersionSettings: LanguageVersionSettings,

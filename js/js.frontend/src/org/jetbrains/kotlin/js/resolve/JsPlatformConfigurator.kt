@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.js.resolve
 
+import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.container.StorageComponentContainer
 import org.jetbrains.kotlin.container.useImpl
 import org.jetbrains.kotlin.container.useInstance
@@ -17,6 +18,7 @@ import org.jetbrains.kotlin.resolve.calls.checkers.LateinitIntrinsicApplicabilit
 import org.jetbrains.kotlin.resolve.checkers.ExpectedActualDeclarationChecker
 import org.jetbrains.kotlin.types.DynamicTypesAllowed
 
+@K1Deprecation
 object JsPlatformConfigurator : PlatformConfiguratorBase(
     DynamicTypesAllowed(),
     additionalDeclarationCheckers = listOf(

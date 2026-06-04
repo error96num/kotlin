@@ -18,10 +18,12 @@ package org.jetbrains.kotlin.js.resolve.diagnostics
 
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
+import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.diagnostics.*
 import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.js.resolve.diagnostics.JsCallData
 
+@K1Deprecation
 object JsCodePositioningStrategy : PositioningStrategy<PsiElement>() {
     override fun markDiagnostic(diagnostic: DiagnosticMarker): List<TextRange> {
         @Suppress("UNCHECKED_CAST")

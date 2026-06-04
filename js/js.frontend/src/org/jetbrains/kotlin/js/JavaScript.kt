@@ -16,6 +16,9 @@
 
 package org.jetbrains.kotlin.js
 
+import org.jetbrains.kotlin.K1Deprecation
+
+@K1Deprecation
 object JavaScript {
     const val EXTENSION = "js"
     const val DOT_EXTENSION = "." + EXTENSION

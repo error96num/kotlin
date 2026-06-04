@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.js.resolve.diagnostics
 
+import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.diagnostics.rendering.CommonRenderers.STRING
 import org.jetbrains.kotlin.diagnostics.rendering.DefaultErrorMessages
 import org.jetbrains.kotlin.diagnostics.rendering.DiagnosticFactoryToRendererMap
@@ -127,6 +128,7 @@ private val DIAGNOSTIC_FACTORY_TO_RENDERER by lazy {
 }
 
 @Suppress("unused") // Used via reflection
+@K1Deprecation
 class DefaultErrorMessagesJs : DefaultErrorMessages.Extension {
     override fun getMap(): DiagnosticFactoryToRendererMap = DIAGNOSTIC_FACTORY_TO_RENDERER
 }

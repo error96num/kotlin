@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.js.resolve.diagnostics
 
+import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.config.LanguageFeature
 import org.jetbrains.kotlin.descriptors.ConstructorDescriptor
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
@@ -17,10 +18,13 @@ import org.jetbrains.kotlin.psi.KtDeclaration
 import org.jetbrains.kotlin.resolve.checkers.DeclarationChecker
 import org.jetbrains.kotlin.resolve.checkers.DeclarationCheckerContext
 
+@K1Deprecation
 class JsNameCharsChecker(suggestion: JsNameSuggestion) : AbstractNameCharsChecker(suggestion)
 
+@K1Deprecation
 class WasmNameCharsChecker(suggestion: WasmNameSuggestion) : AbstractNameCharsChecker(suggestion)
 
+@K1Deprecation
 abstract class AbstractNameCharsChecker(private val suggestion: NameSuggestion) : DeclarationChecker {
     override fun check(declaration: KtDeclaration, descriptor: DeclarationDescriptor, context: DeclarationCheckerContext) {
         if (context.languageVersionSettings.supportsFeature(LanguageFeature.JsAllowInvalidCharsIdentifiersEscaping)) {

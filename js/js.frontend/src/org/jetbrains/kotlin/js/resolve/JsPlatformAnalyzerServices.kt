@@ -16,10 +16,12 @@
 
 package org.jetbrains.kotlin.js.resolve
 
+import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.builtins.DefaultBuiltIns
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.resolve.*
 
+@K1Deprecation
 object JsPlatformAnalyzerServices : PlatformDependentAnalyzerServices() {
     override val defaultImportsProvider: DefaultImportsProvider = JsDefaultImportsProvider
     override val platformConfigurator: PlatformConfigurator = JsPlatformConfigurator
