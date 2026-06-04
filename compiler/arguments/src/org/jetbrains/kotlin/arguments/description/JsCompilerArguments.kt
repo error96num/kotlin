@@ -256,7 +256,7 @@ val actualJsArguments by compilerArgumentsLevel(CompilerArgumentsLevelNames.jsAr
         additionalAnnotations(Enables(LanguageFeature.JsExportingSuspendLambdas))
 
         lifecycle(
-            introducedVersion = KotlinReleaseVersion.v2_4_0,
+            introducedVersion = KotlinReleaseVersion.v2_4_20
         )
     }
 

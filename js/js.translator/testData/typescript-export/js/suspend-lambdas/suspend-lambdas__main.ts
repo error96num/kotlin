@@ -50,7 +50,7 @@ async function box(): Promise<string> {
 
     assert(await chain(async (x: number) => x + 1, async (x: number) => x * 3, 4) === 15, "chain");
 
-    const back = await roundTrip(async (x: number) => x * 2);
+    const back = roundTrip(async (x: number) => x * 2);
     assert(await back(10) === 21, "roundTrip");
 
     const holder = new LambdaHolder(100);

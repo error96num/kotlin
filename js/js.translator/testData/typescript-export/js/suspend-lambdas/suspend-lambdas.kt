@@ -41,7 +41,7 @@ suspend fun chain(
 ): Int = b(a(x))
 
 @JsExport
-suspend fun roundTrip(callback: suspend (Int) -> Int): suspend (Int) -> Int =
+fun roundTrip(callback: suspend (Int) -> Int): suspend (Int) -> Int =
     { x -> callback(x) + 1 }
 
 @JsExport

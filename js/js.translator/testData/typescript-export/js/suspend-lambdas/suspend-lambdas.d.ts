@@ -8,7 +8,7 @@ declare namespace JS_TESTS {
         function runLambda(callback: (p0: number) => Promise<number>): Promise<number>;
         function runVoidLambda(callback: () => Promise<void>): Promise<void>;
         function chain(a: (p0: number) => Promise<number>, b: (p0: number) => Promise<number>, x: number): Promise<number>;
-        function roundTrip(callback: (p0: number) => Promise<number>): Promise<(p0: number) => Promise<number>>;
+        function roundTrip(callback: (p0: number) => Promise<number>): (p0: number) => Promise<number>;
         class LambdaHolder {
             constructor(base: number);
             get multiplier(): (p0: number, p1: number) => Promise<number>;

@@ -387,13 +387,11 @@ class InteropCallableReferenceLowering(val context: JsIrBackendContext) : BodyLo
         }
 
         innerLambda.parent = lambdaDeclaration
+        innerLambda.shouldBeCompiledAsGenerator = true
 
-        if (context.configuration.compileSuspendAsJsGenerator && lambdaDeclaration.isSuspend) {
-            innerLambda.shouldBeCompiledAsGenerator = true
-        }
 
         val lambdaBody = lambdaDeclaration.body
-            ?.patchDeclarationParents(lambdaDeclaration) ?: return lambdaDeclaration
+            ?.patchDeclarationParents(innerLambda) ?: return lambdaDeclaration
 
         innerLambda.body = lambdaBody
         lambdaDeclaration.shouldBeCompiledAsGenerator = false
@@ -407,7 +405,7 @@ class InteropCallableReferenceLowering(val context: JsIrBackendContext) : BodyLo
                         endOffset,
                         lambdaType,
                         innerLambda,
-                        JsStatementOrigins.PROMISIFIED_SUSPEND_CALLABLE_REFERENCE
+                        JsStatementOrigins.SYNTHESIZED_STATEMENT
                     )
                 })
             }

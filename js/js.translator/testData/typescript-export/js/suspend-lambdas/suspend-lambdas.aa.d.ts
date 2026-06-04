@@ -9,7 +9,7 @@ declare namespace JS_TESTS {
         function runLambda(callback: (p0: number) => Promise<number>): Promise<number>;
         function runVoidLambda(callback: () => Promise<void>): Promise<void>;
         function chain(a: (p0: number) => Promise<number>, b: (p0: number) => Promise<number>, x: number): Promise<number>;
-        function roundTrip(callback: (p0: number) => Promise<number>): Promise<(p0: number) => Promise<number>>;
+        function roundTrip(callback: (p0: number) => Promise<number>): (p0: number) => Promise<number>;
         function callKotlinLambdaFromKotlin(): Promise<number>;
         function produceArrayOfSuspendLambdas(): Array<(p0: number) => Promise<number>>;
         function reduceArrayOfSuspendLambdas(lambdas: Array<(p0: number) => Promise<number>>, start: number): Promise<number>;

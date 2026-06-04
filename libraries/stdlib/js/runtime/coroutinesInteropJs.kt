@@ -3,11 +3,12 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
  */
 
-@file:OptIn(ExperimentalStdlibApi::class, JsIntrinsic::class)
+@file:OptIn(JsIntrinsic::class)
 package kotlin.coroutines.intrinsics
 
 import kotlin.coroutines.Continuation
 import kotlin.internal.UsedFromCompilerGeneratedCode
+import kotlin.js.Promise
 
 @JsName("$")
 @UsedFromCompilerGeneratedCode
@@ -16,10 +17,10 @@ internal suspend fun <T> suspendLambdaRun(value: dynamic): T {
     // this specific check shows the best benchmarking results across all browsers
     // between different approaches.
     // You can check the micro-benchmark here: https://jsbm.dev/L2qWRbhEQABha
-    if (value.constructor === js("Promise")) {
+    if (value.constructor === Promise::class.js) {
         return await(value)
     } else {
-        return jsSuspendValue(value)
+        return jsYieldStar(value)
     }
 }
 

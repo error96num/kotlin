@@ -318,7 +318,6 @@ class BackendJsSymbols(
 
     val jsYieldFunctionSymbol by CallableIds.jsYield.functionSymbol()
     val jsYieldStarFunctionSymbol by CallableIds.jsYieldStar.functionSymbol()
-    val jsSuspendValueFunctionSymbol by CallableIds.jsSuspendValue.functionSymbol()
 
     val jsInvokeSuspendSuperType: IrSimpleFunctionSymbol by CallableIds.invokeSuspendSuperType.functionSymbol()
     val jsInvokeSuspendSuperTypeWithReceiver: IrSimpleFunctionSymbol by CallableIds.invokeSuspendSuperTypeWithReceiver.functionSymbol()
@@ -669,7 +668,6 @@ private object CallableIds {
     val jsNewAnonymousClass = "jsNewAnonymousClass".jsCallableId
     val jsYield = "jsYield".jsCallableId
     val jsYieldStar = "jsYieldStar".jsCallableId
-    val jsSuspendValue = "jsSuspendValue".jsCallableId
     val generateInterfaceSymbolById = "generateInterfaceSymbolById".jsCallableId
     val jsGenerateInterfaceSymbol = "jsGenerateInterfaceSymbol".jsCallableId
     val numberRangeToNumber = "numberRangeToNumber".jsCallableId
