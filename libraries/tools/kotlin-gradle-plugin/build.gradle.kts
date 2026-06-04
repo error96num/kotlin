@@ -271,6 +271,8 @@ dependencies {
 
 }
 
+optInToK1Deprecation()
+
 configurations.commonCompileClasspath.get().exclude("org.jetbrains.kotlinx", "kotlinx-coroutines-core")
 
 /**

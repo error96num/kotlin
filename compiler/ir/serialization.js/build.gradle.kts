@@ -35,3 +35,5 @@ sourceSets {
 }
 
 optInToK1Deprecation()
+
+optInToK1Deprecation()
