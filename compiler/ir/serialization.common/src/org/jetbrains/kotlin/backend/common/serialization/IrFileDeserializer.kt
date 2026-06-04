@@ -11,6 +11,7 @@ import org.jetbrains.kotlin.descriptors.impl.EmptyPackageFragmentDescriptor
 import org.jetbrains.kotlin.ir.declarations.IrDeclaration
 import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
+import org.jetbrains.kotlin.ir.declarations.IrTypeAlias
 import org.jetbrains.kotlin.ir.declarations.impl.IrFileImpl
 import org.jetbrains.kotlin.ir.symbols.impl.IrFileSymbolImpl
 import org.jetbrains.kotlin.ir.types.defaultTypeWithoutArguments
@@ -76,6 +77,9 @@ class IrFileDeserializerImpl(
 
     override fun deserializeDeclaration(idSig: IdSignature): IrDeclaration {
         return declarationDeserializer.deserializeDeclaration(loadTopLevelDeclarationProto(idSig), file.startOffset).also {
+            // We are not interested in type aliaes on the second stage.
+            // It would be better to avoid type alias deserialization alltogether, but we don't know that until we parse proto.
+            if (it is IrTypeAlias) return@also
             file.declarations += it
         }
     }

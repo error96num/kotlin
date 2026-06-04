@@ -434,9 +434,11 @@ class IrDeclarationDeserializer(
         return InlineClassRepresentation(parameter.name, parameter.type as IrSimpleType)
     }
 
-    private fun deserializeIrTypeAlias(proto: ProtoTypeAlias, parentStart: Int?, setParent: Boolean = true): IrTypeAlias =
-        withDeserializedIrDeclarationBase(proto.base, parentStart, setParent) { symbol, uniqId, startOffset, endOffset, origin, fcode ->
+    private fun deserializeIrTypeAlias(proto: ProtoTypeAlias, parentStart: Int?): IrTypeAlias =
+        withDeserializedIrDeclarationBase(proto.base, parentStart, setParent = false) { symbol, uniqId, startOffset, endOffset, origin, fcode ->
             symbolTable.declareTypeAlias(uniqId, { symbol.checkSymbolType(TYPEALIAS_SYMBOL) }) {
+                // This is a quick fix for KT-86501
+                if (it.isBound) return@declareTypeAlias it.owner
                 createIfUnbound(it) {
                     val flags = TypeAliasFlags.decode(fcode)
                     val nameType = BinaryNameAndType.decode(proto.nameType)
@@ -450,6 +452,8 @@ class IrDeclarationDeserializer(
                         isActual = flags.isActual,
                         expandedType = deserializeIrType(nameType.typeIndex),
                     )
+                }.apply {
+                    parent = currentDeclarationParent
                 }
             }.usingDeclarationParent {
                 typeParameters = deserializeTypeParameters(proto.typeParameterList, true, startOffset)
@@ -852,7 +856,7 @@ class IrDeclarationDeserializer(
             IR_VALUE_PARAMETER -> error("") // deserializeIrValueParameter(proto.irValueParameter, proto.irValueParameter.index)
             IR_ENUM_ENTRY -> deserializeIrEnumEntry(proto.irEnumEntry, parentStart, setParent)
             IR_LOCAL_DELEGATED_PROPERTY -> deserializeIrLocalDelegatedProperty(proto.irLocalDelegatedProperty, parentStart, setParent)
-            IR_TYPE_ALIAS -> deserializeIrTypeAlias(proto.irTypeAlias, parentStart, setParent)
+            IR_TYPE_ALIAS -> deserializeIrTypeAlias(proto.irTypeAlias, parentStart)
             DECLARATOR_NOT_SET -> error("Declaration deserialization not implemented: ${proto.declaratorCase}")
         }
 
