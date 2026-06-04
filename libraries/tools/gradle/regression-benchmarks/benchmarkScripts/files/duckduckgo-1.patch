@@ -69,16 +69,16 @@ index 27eebf63b..d0ddc3b3e 100644
 +   configure(projectsForK1) {
 +        tasks.withType(KotlinJvmCompile).configureEach { task ->
 +            compilerOptions {
-+                languageVersion.set(KotlinVersion.KOTLIN_1_9)
-+                apiVersion.set(KotlinVersion.KOTLIN_1_9)
++                languageVersion.set(KotlinVersion.KOTLIN_2_0)
++                apiVersion.set(KotlinVersion.KOTLIN_2_0)
 +                setProgressiveMode(false)
 +                logger.debug("Setting -api-version=1.9 and -language-version=1.9 in ${task}")
 +            }
 +
 +         if (task instanceof KspTaskJvm) {
 +            compilerOptions {
-+                languageVersion.set(KotlinVersion.KOTLIN_1_9)
-+                apiVersion.set(KotlinVersion.KOTLIN_1_9)
++                languageVersion.set(KotlinVersion.KOTLIN_2_0)
++                apiVersion.set(KotlinVersion.KOTLIN_2_0)
 +                setProgressiveMode(false)
 +            }
 +         }
