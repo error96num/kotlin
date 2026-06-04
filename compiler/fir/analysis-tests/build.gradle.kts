@@ -57,6 +57,8 @@ sourceSets {
     "testFixtures" { projectDefault() }
 }
 
+optInToK1Deprecation()
+
 projectTests {
     testTask(
         jUnitMode = JUnitMode.JUnit5,
