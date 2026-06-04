@@ -12,7 +12,7 @@ import kotlin.internal.UsedFromCompilerGeneratedCode
 @JsName("$")
 @UsedFromCompilerGeneratedCode
 internal suspend fun <T> suspendLambdaRun(value: dynamic): T {
-    // Please don't change the condition without nice arguments
+    // Please don't change the condition without strong reasons
     // this specific check shows the best benchmarking results across all browsers
     // between different approaches.
     // You can check the micro-benchmark here: https://jsbm.dev/L2qWRbhEQABha
