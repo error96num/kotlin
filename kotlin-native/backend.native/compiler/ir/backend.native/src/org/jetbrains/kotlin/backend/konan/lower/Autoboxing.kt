@@ -20,6 +20,7 @@ import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.builders.*
 import org.jetbrains.kotlin.ir.builders.declarations.buildFun
 import org.jetbrains.kotlin.ir.declarations.*
+import org.jetbrains.kotlin.ir.declarations.isFullValueClass
 import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.ir.expressions.impl.IrConstantPrimitiveImpl
 import org.jetbrains.kotlin.ir.irAttribute
@@ -575,6 +576,7 @@ private class InlineClassTransformer(private val context: Context) : IrBuildingT
                     override fun visitDelegatingConstructorCall(expression: IrDelegatingConstructorCall): IrExpression {
                         expression.transformChildrenVoid()
 
+                        val delegatingCtorClass = expression.symbol.owner.parentAsClass
                         return irBlock(expression) {
                             thisVar = if (irConstructor.isPrimary) {
                                 // Note: block is empty in this case.
@@ -582,6 +584,22 @@ private class InlineClassTransformer(private val context: Context) : IrBuildingT
                             } else {
                                 val value = lowerConstructorCallToValue(expression, expression.symbol.owner)
                                 irTemporary(value)
+                            }
+                            // For full value classes delegating to abstract/sealed parent value classes,
+                            // call the extracted side-effects function to run parent init blocks
+                            if (irConstructor.isPrimary && irClass.isFullValueClass && delegatingCtorClass.isFullValueClass) {
+                                val sideEffectsFunction = getOrCreateInitSideEffectsFunction(
+                                    this@InlineClassTransformer.context, expression.symbol.owner
+                                )
+                                +irCall(sideEffectsFunction).apply {
+                                    // Box the unboxed value to pass as Any? $this parameter
+                                    arguments[0] = irCall(this@InlineClassTransformer.context.getBoxFunction(irClass)).also {
+                                        it.arguments[0] = irGet(thisVar)
+                                    }
+                                    for (i in expression.arguments.indices) {
+                                        arguments[i + 1] = expression.arguments[i]
+                                    }
+                                }
                             }
                         }
                     }
