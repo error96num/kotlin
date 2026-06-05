@@ -81,7 +81,7 @@ class JsSuspendFunctionWithGeneratorsLowering(private val context: JsIrBackendCo
      * After:
      *  ```
      *  [shouldBeCompiledAsGenerator = true]
-     *  suspend fun foo() {
+     *  suspend fun foo(a: suspend () -> Unit) {
      *      println("Hello")
      *      jsYieldStar(suspendHere())
      *      println("World")
