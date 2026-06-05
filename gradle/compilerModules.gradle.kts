@@ -99,7 +99,6 @@ val fe10CompilerModules = arrayOf(
     ":js:js.frontend",
     ":native:frontend.native",
     ":wasm:wasm.frontend",
-    ":compiler:backend.common.jvm",
 ).also { extra["fe10CompilerModules"] = it }
 
 /**
@@ -119,6 +118,7 @@ val irCompilerModules = arrayOf(
  * Modules of JVM backend
  */
 val jvmCompilerModules = arrayOf(
+    ":compiler:backend.common.jvm",
     ":compiler:backend",
     ":compiler:backend.jvm",
     ":compiler:backend.jvm.lower",
