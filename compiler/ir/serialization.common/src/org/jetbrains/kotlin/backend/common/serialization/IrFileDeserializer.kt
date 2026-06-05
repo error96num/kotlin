@@ -77,9 +77,9 @@ class IrFileDeserializerImpl(
 
     override fun deserializeDeclaration(idSig: IdSignature): IrDeclaration {
         return declarationDeserializer.deserializeDeclaration(loadTopLevelDeclarationProto(idSig), file.startOffset).also {
-            // We are not interested in type aliaes on the second stage.
-            // It would be better to avoid type alias deserialization alltogether, but we don't know that until we parse proto.
-            if (it is IrTypeAlias) return@also
+            // Type alias can be accidentally deserialized twice. We shouldn't add it into the declaration list for the second time.
+            // It would be better to avoid type alias deserialization all together, but we don't know that until we parse proto.
+            if (it is IrTypeAlias && file.declarations.contains(it)) return@also
             file.declarations += it
         }
     }
