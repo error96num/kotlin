@@ -6,6 +6,7 @@ index a379e11f0..297497a15 100644
  org.gradle.configureondemand=true
  android.defaults.buildfeatures.buildconfig=true
  android.nonFinalResIds=false
++kotlin.compiler.runViaBuildToolsApi=true
 
  kotlinVersion=<kotlin_version>
 +com.squareup.anvil.trackSourceFiles=false
