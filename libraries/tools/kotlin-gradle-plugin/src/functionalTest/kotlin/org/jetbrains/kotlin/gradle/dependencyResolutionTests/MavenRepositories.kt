@@ -23,7 +23,7 @@ fun RepositoryHandler.mavenCentralCacheRedirector(): MavenArtifactRepository =
 fun RepositoryHandler.kotlinBuildDeps(): MavenArtifactRepository {
     val buildRepo = System.getProperty("kotlinBuildRepo")
         ?: error("kotlinBuildRepo is not set; functionalTest task must provide it")
-    return maven { it.setUrl(java.io.File(buildRepo).toURI()) }
+    return maven { it.url = java.io.File(buildRepo).toURI() }
 }
 
 fun Project.configureRepositoriesForTests() {
