@@ -12,7 +12,7 @@ plugins {
     id("java-test-fixtures")
     id("project-tests-convention")
     /* TODO: Uncomment when blocking issues in `test-inputs-check-v2` are resolved */
-//    id("test-inputs-check-v2")
+    id("test-inputs-check-v2")
 }
 
 val nativeImageClasspath by configurations.creating {
@@ -192,10 +192,10 @@ fun Test.useReachabilityMetadataResources() {
         "kotlin.native-image.resources.path",
     )
     /* TODO: Uncomment when blocking issues in `test-inputs-check-v2` are resolved */
-//    testInputsCheck {
-//        extraPermissions.add(graalLauncher.map {
-//            val jdkHome = it.executablePath.asFile.parentFile.parentFile.absolutePath
-//            """permission java.io.FilePermission "$jdkHome/-", "read,execute";"""
-//        })
-//    }
+    testInputsCheck {
+        extraPermissions.add(graalLauncher.map {
+            val jdkHome = it.executablePath.asFile.parentFile.parentFile.absolutePath
+            """permission java.io.FilePermission "$jdkHome/-", "read,execute";"""
+        })
+    }
 }
