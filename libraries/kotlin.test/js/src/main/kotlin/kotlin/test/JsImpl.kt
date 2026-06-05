@@ -24,17 +24,26 @@ internal actual inline fun AssertionErrorWithCause(message: String?, cause: Thro
 
 
 @PublishedApi
-internal actual fun <T : Throwable> checkResultIsFailure(exceptionClass: KClass<T>, message: String?, blockResult: Result<Any?>): T {
+internal actual fun <T : Throwable> checkResultIsFailure(exceptionClass: KClass<T>, message: String?, blockResult: Result<Any?>): T =
+    checkResultIsFailureImpl(exceptionClass, { message }, blockResult)
+
+@PublishedApi
+@ExperimentalKotlinTestApi
+@SinceKotlin("2.4")
+internal actual fun <T : Throwable> checkResultIsFailure(exceptionClass: KClass<T>, lazyMessage: () -> String, blockResult: Result<Any?>): T =
+    checkResultIsFailureImpl(exceptionClass, lazyMessage, blockResult)
+
+private fun <T : Throwable> checkResultIsFailureImpl(exceptionClass: KClass<T>, lazyMessage: () -> String?, blockResult: Result<Any?>): T {
     blockResult.fold(
         onSuccess = { v ->
-            asserter.fail(messagePrefix(message) + "Expected an exception of $exceptionClass to be thrown, ${formatResultMessage(v)}")
+            asserter.fail(messagePrefix(lazyMessage()) + "Expected an exception of $exceptionClass to be thrown, ${formatResultMessage(v)}")
         },
         onFailure = { e ->
             if (exceptionClass.isInstance(e)) {
                 @Suppress("UNCHECKED_CAST")
                 return e as T
             }
-            asserter.fail(messagePrefix(message) + "Expected an exception of $exceptionClass to be thrown, but was $e", e)
+            asserter.fail(messagePrefix(lazyMessage()) + "Expected an exception of $exceptionClass to be thrown, but was $e", e)
         }
     )
 }

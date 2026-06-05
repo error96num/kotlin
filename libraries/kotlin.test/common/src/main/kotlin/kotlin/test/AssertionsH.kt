@@ -17,3 +17,10 @@ public expect fun todo(block: () -> Unit)
 /** Asserts that a [blockResult] is a failure with the specific exception type being thrown. */
 @PublishedApi
 internal expect fun <T : Throwable> checkResultIsFailure(exceptionClass: KClass<T>, message: String?, blockResult: Result<Any?>): T
+
+
+/** Asserts that a [blockResult] is a failure with the specific exception type being thrown. */
+@ExperimentalKotlinTestApi
+@SinceKotlin("2.4")
+@PublishedApi
+internal expect fun <T : Throwable> checkResultIsFailure(exceptionClass: KClass<T>, lazyMessage: () -> String, blockResult: Result<Any?>): T

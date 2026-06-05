@@ -7,6 +7,7 @@ package kotlin.test.tests
 
 import kotlin.reflect.typeOf
 import kotlin.test.*
+import kotlin.test.tests.testFailureMessagesAreTheSame
 
 @OptIn(ExperimentalKotlinTestApi::class)
 class BasicAssertionsTest {
@@ -79,6 +80,15 @@ class BasicAssertionsTest {
     }
 
     @Test
+    fun testAssertFailsWithLazy() {
+        assertFailsWith<IndexOutOfBoundsException>({ fail() }) { intArrayOf(1, 2, 3)[10] }
+
+        testFailureMessagesAreTheSame({ assertFailsWith<IndexOutOfBoundsException>("Ouch") { 42 } }) {
+            assertFailsWith<IndexOutOfBoundsException>({ "Ouch" }) { 42 }
+        }
+    }
+
+    @Test
     fun testAssertFailsWithClass() {
         assertFailsWith(IllegalArgumentException::class) {
             throw IllegalArgumentException("This is illegal")
@@ -95,6 +105,17 @@ class BasicAssertionsTest {
 
         checkFailedAssertion {
             assertFailsWith(Exception::class) { }
+        }
+    }
+
+    @Test
+    fun testAssertFailsWithClassLazy() {
+        assertFailsWith(IllegalArgumentException::class, { fail() }) {
+            throw IllegalArgumentException()
+        }
+
+        testFailureMessagesAreTheSame({ assertFailsWith(IllegalArgumentException::class, "Ouch") { 42 } }) {
+            assertFailsWith(IllegalArgumentException::class, { "Ouch" }) { 42 }
         }
     }
 
@@ -318,6 +339,14 @@ class BasicAssertionsTest {
         checkFailedAssertion { assertFails { } }
     }
 
+    @Test
+    fun testAssertFailsLazy() {
+        assertIs<IllegalStateException>(assertFails({ fail() }) { throw IllegalStateException() })
+
+        testFailureMessagesAreTheSame({ assertFails("Ouch") { 42 } }) {
+            assertFails({ "Ouch" }) { 42 }
+        }
+    }
 
     @Test
     fun testAssertNotEquals() {

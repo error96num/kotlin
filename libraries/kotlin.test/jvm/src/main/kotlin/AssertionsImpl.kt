@@ -13,10 +13,19 @@ import kotlin.reflect.*
 
 /** Asserts that a [blockResult] is a failure with the specific exception type being thrown. */
 @PublishedApi
-internal actual fun <T : Throwable> checkResultIsFailure(exceptionClass: KClass<T>, message: String?, blockResult: Result<Any?>): T {
+internal actual fun <T : Throwable> checkResultIsFailure(exceptionClass: KClass<T>, message: String?, blockResult: Result<Any?>): T =
+    checkResultIsFailureImpl(exceptionClass, { message }, blockResult)
+
+@SinceKotlin("2.4")
+@ExperimentalKotlinTestApi
+@PublishedApi
+internal actual fun <T : Throwable> checkResultIsFailure(exceptionClass: KClass<T>, lazyMessage: () -> String, blockResult: Result<Any?>): T =
+    checkResultIsFailureImpl(exceptionClass, lazyMessage, blockResult)
+
+private fun <T : Throwable> checkResultIsFailureImpl(exceptionClass: KClass<T>, lazyMessage: () -> String?, blockResult: Result<Any?>): T {
     blockResult.fold(
         onSuccess = { v ->
-            val msg = messagePrefix(message)
+            val msg = messagePrefix(lazyMessage())
             asserter.fail(msg + "Expected an exception of ${exceptionClass.java} to be thrown, ${formatResultMessage(v)}")
         },
         onFailure = { e ->
@@ -25,7 +34,7 @@ internal actual fun <T : Throwable> checkResultIsFailure(exceptionClass: KClass<
                 return e as T
             }
 
-            asserter.fail(messagePrefix(message) + "Expected an exception of ${exceptionClass.java} to be thrown, but was $e", e)
+            asserter.fail(messagePrefix(lazyMessage()) + "Expected an exception of ${exceptionClass.java} to be thrown, but was $e", e)
         }
     )
 }
