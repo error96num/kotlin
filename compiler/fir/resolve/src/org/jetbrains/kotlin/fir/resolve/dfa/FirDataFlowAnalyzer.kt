@@ -1127,6 +1127,13 @@ abstract class FirDataFlowAnalyzer(
         }
     }
 
+    fun exitAnnotationCall() {
+        context.variableAssignmentAnalyzer.exitFunctionCall(callCompleted = true)
+
+        val annotationExitNode = graphBuilder.exitAnnotationCall()
+        annotationExitNode.mergeIncomingFlow()
+    }
+
     @CfgInternals
     fun updateCollectionLiteralNodes(
         collectionLiteral: FirCollectionLiteral,
@@ -1576,12 +1583,8 @@ abstract class FirDataFlowAnalyzer(
         graphBuilder.enterFakeExpression().mergeIncomingFlow()
     }
 
-    fun exitAnnotation(alsoExitCall: Boolean = false) {
-        if (alsoExitCall) {
-            // TODO (KT-86555): clean up. One of the possible solutions is explicit call to `exitFunctionCall` from transformer.
-            context.variableAssignmentAnalyzer.exitFunctionCall(callCompleted = true)
-        }
-        graphBuilder.exitFakeExpression(alsoExitCall)
+    fun exitAnnotation() {
+        graphBuilder.exitFakeExpression()
         resetSmartCastPosition() // rollback to position before annotation
     }
 
