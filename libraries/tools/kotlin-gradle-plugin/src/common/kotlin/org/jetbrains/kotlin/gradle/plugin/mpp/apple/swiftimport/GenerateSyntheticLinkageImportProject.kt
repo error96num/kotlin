@@ -194,7 +194,7 @@ internal abstract class GenerateSyntheticLinkageImportProject : DefaultTask(), U
             logger.error("Please go to Tools -> Swift Package Manager -> Resolve Dependencies")
         }
         val rendered = SyntheticPackageChangeReport.render(changes)
-        if (rendered.isNotEmpty()) println(rendered)
+        if (rendered.isNotEmpty()) logger.error(rendered)
         error("Synthetic project state updated")
     }
 
