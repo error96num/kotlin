@@ -477,6 +477,9 @@ class SwiftPMImportXcodeIntegrationIT : KGPBaseTest() {
                 // The new diagnostic: file-level breakdown.
                 assertOutputContains("Synthetic linkage package files changed during the build:")
                 assertOutputContains("Sources/$SYNTHETIC_IMPORT_TARGET_MAGIC_NAME/$SYNTHETIC_IMPORT_TARGET_MAGIC_NAME.m (modified)")
+                // Only the tampered file is reported; no spurious added/removed entries.
+                assertOutputDoesNotContain("(added)")
+                assertOutputDoesNotContain("(removed)")
             }
         }
     }
