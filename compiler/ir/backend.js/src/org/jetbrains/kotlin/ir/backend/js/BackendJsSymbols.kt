@@ -352,7 +352,7 @@ class BackendJsSymbols(
     val promisifyFunctionSymbol by CallableIds.promisify.functionSymbol()
     val suspendOrReturnFunctionSymbol: IrSimpleFunctionSymbol by CallableIds.suspendOrReturn.functionSymbol()
     val orPromiseFunctionSymbol by CallableIds.orPromise.functionSymbol()
-    val lambdaRunFunctionSymbol by CallableIds.suspendLambdaRun.functionSymbol()
+    val suspendLambdaRunFunctionSymbol by CallableIds.suspendLambdaRun.functionSymbol()
 
     val jsNumberRangeToNumber by CallableIds.numberRangeToNumber.functionSymbol()
     val jsNumberRangeToLong by CallableIds.numberRangeToLong.functionSymbol()

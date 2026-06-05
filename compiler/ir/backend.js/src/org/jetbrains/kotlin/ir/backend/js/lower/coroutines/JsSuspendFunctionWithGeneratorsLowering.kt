@@ -28,7 +28,7 @@ var IrFunction.shouldBeCompiledAsGenerator by irFlag(copyByDefault = true)
 class JsSuspendFunctionWithGeneratorsLowering(private val context: JsIrBackendContext) : DeclarationTransformer {
     private val jsYieldFunctionSymbol = context.symbols.jsYieldFunctionSymbol
     private val jsYieldStarFunctionSymbol = context.symbols.jsYieldStarFunctionSymbol
-    private val lambdaRunFunctionSymbol = context.symbols.lambdaRunFunctionSymbol
+    private val lambdaRunFunctionSymbol = context.symbols.suspendLambdaRunFunctionSymbol
 
     override fun lower(irModule: IrModuleFragment) {
         if (!context.compileSuspendAsJsGenerator) return
