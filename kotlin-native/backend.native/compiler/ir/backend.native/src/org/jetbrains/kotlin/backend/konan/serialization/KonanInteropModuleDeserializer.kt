@@ -773,7 +773,7 @@ internal class KonanInteropModuleDeserializer(
                 source = SourceElement.NO_SOURCE,
                 type = annotationClassSymbol.defaultTypeWithoutArguments,
                 constructorTypeArgumentsCount = 0,
-                annotationClassSymbol = annotationClassSymbol,
+                classSymbol = annotationClassSymbol,
                 argumentMapping = irArguments,
                 linker = linker,
         )
