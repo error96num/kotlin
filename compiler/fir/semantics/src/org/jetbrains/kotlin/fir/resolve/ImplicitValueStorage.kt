@@ -127,8 +127,12 @@ class ImplicitValueStorage private constructor(
 
     fun receiversAsReversed(): List<ImplicitReceiverValue<*>> = implicitReceiverStack.asReversed()
 
+    private val labelByImplicitValueMap: Map<ImplicitReceiverValue<*>, Name?> by lazy {
+        implicitReceiversByLabel.entries.flatMap { entry -> entry.value.map { it to entry.key } }.toMap()
+    }
+
     fun ImplicitReceiverValue<*>.label(): Name? {
-        return this@ImplicitValueStorage.implicitReceiversByLabel.entries.find { it.value.contains(this@label) }?.key
+        return labelByImplicitValueMap[this@label]
     }
 
     /**
