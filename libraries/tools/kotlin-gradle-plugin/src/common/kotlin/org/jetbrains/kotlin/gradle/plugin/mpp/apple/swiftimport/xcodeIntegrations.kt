@@ -338,7 +338,10 @@ private fun saveJsonBackIntoPbxproj(
         it.commandLine("xcode-select", "-p")
         it.standardOutput = xcodeSelectOutput
     }
-    val developerPath = xcodeSelectOutput.toString().trim()
+    // xcode-select -p may return a symlink to the developer dir (e.g. when DEVELOPER_DIR points to one).
+    // Canonicalize it, because sibling paths of the developer dir (Frameworks, SharedFrameworks) are
+    // resolved relative to it and exist only inside the real Xcode.app bundle (KT-84384)
+    val developerPath = File(xcodeSelectOutput.toString().trim()).canonicalPath
     // developerPath is typically /Applications/Xcode.app/Contents/Developer
     // SharedFrameworks is at /Applications/Xcode.app/Contents/SharedFrameworks (sibling of Developer)
     val sharedFrameworksPath = File(developerPath).parentFile.resolve("SharedFrameworks").path
