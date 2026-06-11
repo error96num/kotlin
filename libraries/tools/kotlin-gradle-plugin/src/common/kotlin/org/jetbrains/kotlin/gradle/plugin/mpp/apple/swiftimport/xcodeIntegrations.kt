@@ -12,6 +12,7 @@ import org.gradle.api.tasks.TaskAction
 import org.gradle.process.ExecOperations
 import org.gradle.work.DisableCachingByDefault
 import org.jetbrains.kotlin.gradle.plugin.mpp.apple.AppleXcodeTasks
+import org.jetbrains.kotlin.gradle.plugin.mpp.apple.embedSwiftExportTaskName
 import org.jetbrains.kotlin.gradle.utils.getFile
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -71,6 +72,13 @@ internal abstract class IntegrateEmbedAndSignIntoXcodeProject : DefaultTask() {
     @get:Internal
     abstract val currentDir: Property<File>
 
+    /**
+     * KT-86665: When `true`, the generated Run Script build phase invokes the Swift Export
+     * embedAndSign task instead of the Objective-C export one.
+     */
+    @get:Internal
+    abstract val useSwiftExport: Property<Boolean>
+
     @get:Internal
     val xcodeprojTemporaries = project.layout.buildDirectory.dir("kotlin/swiftImportEmbedAndSignXcodeprojMutationTemporaries")
 
@@ -107,12 +115,19 @@ internal abstract class IntegrateEmbedAndSignIntoXcodeProject : DefaultTask() {
             error("Couldn't find targets to insert embedAndSign integration")
         }
 
+        val embedTaskName = if (useSwiftExport.getOrElse(false)) {
+            embedSwiftExportTaskName()
+        } else {
+            AppleXcodeTasks.embedAndSignTaskPrefix + AppleXcodeTasks.embedAndSignTaskPostfix
+        }
+
         val srcrootPath = projectPath.parentFile
         val relativeGradlewPath = gradlewPath.parentFile.relativeTo(srcrootPath)
         nativeTargets.forEach {
             val scriptPhase = generateScriptReference(
                 relativeGradlewPath.path,
                 gradleProjectPath,
+                embedTaskName,
             )
             val scriptPhaseReference = generateRandomPBXObjectReference()
             if (it.buildPhases == null) {
@@ -133,6 +148,7 @@ internal abstract class IntegrateEmbedAndSignIntoXcodeProject : DefaultTask() {
     private fun generateScriptReference(
         relativeGradlewRootPath: String,
         gradleProjectPath: String,
+        embedTaskName: String,
     ) = PbxShellScriptBuildPhase(
         name = "Compile Kotlin Framework",
         alwaysOutOfDate = "1",
@@ -146,7 +162,7 @@ internal abstract class IntegrateEmbedAndSignIntoXcodeProject : DefaultTask() {
               exit 0
             fi
             cd "${'$'}${SRCROOT_ENV}/${relativeGradlewRootPath}"
-            ./gradlew ${gradleTaskPath(gradleProjectPath, AppleXcodeTasks.embedAndSignTaskPrefix + AppleXcodeTasks.embedAndSignTaskPostfix)} -i
+            ./gradlew ${gradleTaskPath(gradleProjectPath, embedTaskName)} -i
             """.trimIndent()
         )
     )
@@ -155,6 +171,7 @@ internal abstract class IntegrateEmbedAndSignIntoXcodeProject : DefaultTask() {
         const val TASK_NAME = "integrateEmbedAndSign"
         const val GRADLEW_PATH_ENV = "GRADLEW_PATH"
         const val GRADLE_PROJECT_PATH_ENV = "GRADLE_PROJECT_PATH"
+        const val SWIFT_EXPORT_ENV = "SWIFT_EXPORT"
         // This assumes that SRCROOT is the same as PROJECT_FILE_PATH which we read initially
         const val SRCROOT_ENV = "SRCROOT"
     }

@@ -536,7 +536,7 @@ private fun NativeBinary.embedAndSignTaskName(): String = lowerCamelCaseName(
     AppleXcodeTasks.embedAndSignTaskPostfix
 )
 
-private fun embedSwiftExportTaskName(): String = lowerCamelCaseName(
+internal fun embedSwiftExportTaskName(): String = lowerCamelCaseName(
     "embed",
     SwiftExportDSLConstants.SWIFT_EXPORT_EXTENSION_NAME,
     "ForXcode"

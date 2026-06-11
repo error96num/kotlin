@@ -821,6 +821,12 @@ private fun Project.registerXcodeIntegrationTasks(
             it.dependsOn(syntheticImportProjectGenerationTaskForLinkageForCli)
             it.currentDir.set(gradle.startParameter.currentDir)
             it.xcodeprojPath.set(projectPathProvider)
+            // KT-86665: Allow choosing the Swift Export embedAndSign integration instead of the ObjC export one
+            it.useSwiftExport.set(
+                project.providers.environmentVariable(IntegrateEmbedAndSignIntoXcodeProject.SWIFT_EXPORT_ENV)
+                    .map { value -> value.equals("YES", ignoreCase = true) || value.toBoolean() }
+                    .orElse(false)
+            )
         }
     project.registerTask<IntegrateLinkagePackageIntoXcodeProject>(IntegrateLinkagePackageIntoXcodeProject.TASK_NAME) {
         it.dependsOn(syntheticImportProjectGenerationTaskForLinkageForCli)
