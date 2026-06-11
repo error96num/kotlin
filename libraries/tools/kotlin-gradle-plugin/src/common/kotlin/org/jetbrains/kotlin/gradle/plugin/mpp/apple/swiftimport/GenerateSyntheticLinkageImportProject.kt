@@ -187,6 +187,25 @@ internal abstract class GenerateSyntheticLinkageImportProject : DefaultTask(), U
                     binaryTarget = null,
                 )
             }
+            removeStaleSubpackages(packageRoot)
+        }
+    }
+
+    /**
+     * Subpackages are derived from dependency identifiers which encode the dependency version. Upgrading or removing a
+     * dependency changes the expected subpackage set, so the previously generated subpackages must be deleted to not
+     * pollute the linkage package with stale targets
+     */
+    private fun removeStaleSubpackages(packageRoot: File) {
+        val expectedSubpackages = dependencyIdentifierToImportedSwiftPMDependencies.get()
+            .metadataByDependencyIdentifier.keys.mapTo(hashSetOf()) { it.identifier }
+        if (syntheticProductType.get() == SyntheticProductType.DYNAMIC) {
+            expectedSubpackages.add(SYNTHETIC_IMPORT_DYLIB)
+        }
+        packageRoot.resolve(SUBPACKAGES).listFiles()?.forEach { subpackage ->
+            if (subpackage.name !in expectedSubpackages) {
+                subpackage.deleteRecursively()
+            }
         }
     }
 

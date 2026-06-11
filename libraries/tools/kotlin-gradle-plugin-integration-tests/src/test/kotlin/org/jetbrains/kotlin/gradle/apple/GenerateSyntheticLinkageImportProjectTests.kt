@@ -268,6 +268,50 @@ class GenerateSyntheticLinkageImportProjectTests : KGPBaseTest() {
         }
     }
 
+    @GradleTest
+    fun `package generation removes stale subpackages after dependency upgrade`(version: GradleVersion) {
+        project("empty", version) {
+            val upgradedDependencyProp = "upgradedDependency"
+            plugins {
+                kotlin("multiplatform").apply(false)
+            }
+            buildScriptInjection {
+                project.createKotlinExtension(KotlinMultiplatformExtension::class)
+                val extension = project.locateOrRegisterSwiftPMDependenciesExtension()
+                val dependencyVersion = if (project.hasProperty(upgradedDependencyProp)) "2_0_0" else "1_0_0"
+                project.tasks.register<GenerateSyntheticLinkageImportProject>("packageGeneration") {
+                    configureWithExtension(extension)
+                    konanTargets.set(setOf(KonanTarget.IOS_ARM64))
+                    dependencyIdentifierToImportedSwiftPMDependencies.set(
+                        TransitiveSwiftPMDependencies(
+                            mapOf(
+                                SwiftPMDependencyIdentifier("dep_$dependencyVersion", true) to SwiftPMImportMetadata(
+                                    konanTargets = setOf("ios_arm64"),
+                                    iosDeploymentVersion = "123.0",
+                                    macosDeploymentVersion = null,
+                                    watchosDeploymentVersion = null,
+                                    tvosDeploymentVersion = null,
+                                    isModulesDiscoveryEnabled = true,
+                                    dependencies = setOf(),
+                                ),
+                            )
+                        )
+                    )
+                    syntheticProductType.set(SyntheticProductType.INFERRED)
+                }
+            }
+
+            val subpackagesPath = projectPath.resolve("build/kotlin/swiftImport/subpackages")
+            build("packageGeneration") {
+                assertDirectoryExists(subpackagesPath.resolve("dep_1_0_0"))
+            }
+            build("packageGeneration", "-P$upgradedDependencyProp=true") {
+                assertDirectoryExists(subpackagesPath.resolve("dep_2_0_0"))
+                assertDirectoryDoesNotExist(subpackagesPath.resolve("dep_1_0_0"))
+            }
+        }
+    }
+
     @Serializable
     data class PackageDescription(
         val dependencies: List<PackageDependency>,
