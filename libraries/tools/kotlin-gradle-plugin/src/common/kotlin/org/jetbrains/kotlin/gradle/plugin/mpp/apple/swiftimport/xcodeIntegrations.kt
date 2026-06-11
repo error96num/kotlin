@@ -85,11 +85,9 @@ internal abstract class IntegrateEmbedAndSignIntoXcodeProject : DefaultTask() {
             ?: searchForGradlew(projectPath)
             ?: error("Couldn't find path to Gradle executable. Please specify path using ${GRADLEW_PATH_ENV} environment variable")
 
-        val gradleProjectPath = System.getenv(GRADLE_PROJECT_PATH_ENV)
-            ?: error("""
-                Please specify path to gradle project in $GRADLE_PROJECT_PATH_ENV environment variable
-                For example: export $GRADLE_PROJECT_PATH_ENV=:shared
-            """.trimIndent())
+        // embedAndSign lives in the same project as this task, so derive the Gradle project path from this task's own path
+        // e.g. ":shared:integrateEmbedAndSign" -> ":shared"; ":integrateEmbedAndSign" (root project) -> ":"
+        val gradleProjectPath = path.removeSuffix(":$name").ifEmpty { ":" }
 
         val pbxprojPath = projectPath.resolve("project.pbxproj")
         val project = deserializeXcodeProject(pbxprojPath, execOps)
@@ -154,7 +152,6 @@ internal abstract class IntegrateEmbedAndSignIntoXcodeProject : DefaultTask() {
     companion object {
         const val TASK_NAME = "integrateEmbedAndSign"
         const val GRADLEW_PATH_ENV = "GRADLEW_PATH"
-        const val GRADLE_PROJECT_PATH_ENV = "GRADLE_PROJECT_PATH"
         // This assumes that SRCROOT is the same as PROJECT_FILE_PATH which we read initially
         const val SRCROOT_ENV = "SRCROOT"
     }

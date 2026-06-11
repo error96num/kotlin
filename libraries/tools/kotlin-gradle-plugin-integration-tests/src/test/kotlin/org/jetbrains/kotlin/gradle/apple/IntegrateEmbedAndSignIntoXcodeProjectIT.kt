@@ -49,7 +49,6 @@ class IntegrateEmbedAndSignIntoXcodeProjectIT : KGPBaseTest() {
                 environmentVariables = EnvironmentalVariables(
                     "XCODEPROJ_PATH" to "iosApp/iosApp.xcodeproj",
                     "GRADLEW_PATH" to gradlewPath.absolutePathString(),
-                    "GRADLE_PROJECT_PATH" to ":",
                 )
             ) {
                 val shellScript = pbxFile.kotlinPhaseShellScripts().single()
@@ -83,7 +82,6 @@ class IntegrateEmbedAndSignIntoXcodeProjectIT : KGPBaseTest() {
                 environmentVariables = EnvironmentalVariables(
                     "XCODEPROJ_PATH" to "iosApp/iosApp.xcodeproj",
                     "GRADLEW_PATH" to projectPath.resolve("gradlew").absolutePathString(),
-                    "GRADLE_PROJECT_PATH" to ":",
                 )
             ) {
                 val shellScript = pbxFile.kotlinPhaseShellScripts().single()
@@ -109,7 +107,6 @@ class IntegrateEmbedAndSignIntoXcodeProjectIT : KGPBaseTest() {
                 environmentVariables = EnvironmentalVariables(
                     "XCODEPROJ_PATH" to "iosApp/iosApp.xcodeproj",
                     "GRADLEW_PATH" to projectPath.resolve("gradlew").absolutePathString(),
-                    "GRADLE_PROJECT_PATH" to ":",
                 )
             ) {
                 assertOutputContains("Found embedAndSign integration. Nothing to do")
@@ -138,7 +135,6 @@ class IntegrateEmbedAndSignIntoXcodeProjectIT : KGPBaseTest() {
                 environmentVariables = EnvironmentalVariables(
                     "XCODEPROJ_PATH" to "iosApp/iosApp.xcodeproj",
                     "GRADLEW_PATH" to projectPath.resolve("gradlew").absolutePathString(),
-                    "GRADLE_PROJECT_PATH" to ":",
                 )
             ) {
                 assertOutputContains("Couldn't find targets to insert embedAndSign integration")
@@ -172,7 +168,6 @@ class IntegrateEmbedAndSignIntoXcodeProjectIT : KGPBaseTest() {
                 environmentVariables = EnvironmentalVariables(
                     "XCODEPROJ_PATH" to "iosApp/iosApp.xcodeproj",
                     "GRADLEW_PATH" to projectPath.resolve("gradlew").absolutePathString(),
-                    "GRADLE_PROJECT_PATH" to ":",
                 )
             ) {
                 val xcodeProject: XcodeProject = pbxFile.readPbxprojAsXcodeProject()
@@ -188,18 +183,27 @@ class IntegrateEmbedAndSignIntoXcodeProjectIT : KGPBaseTest() {
     }
 
     @GradleTest
-    fun `integrateEmbedAndSign fails when GRADLE_PROJECT_PATH env var is missing`(version: GradleVersion) {
+    fun `integrateEmbedAndSign ignores the legacy GRADLE_PROJECT_PATH env var`(version: GradleVersion) {
         project("emptyxcode-no-embedandsign", version) {
             initDefaultKmpWithLocalSPM()
 
-            buildAndFail(
+            val pbxFile = projectPath.resolve("iosApp/iosApp.xcodeproj/project.pbxproj")
+
+            build(
                 "integrateEmbedAndSign",
                 environmentVariables = EnvironmentalVariables(
                     "XCODEPROJ_PATH" to "iosApp/iosApp.xcodeproj",
                     "GRADLEW_PATH" to projectPath.resolve("gradlew").absolutePathString(),
+                    // KT-86571: the project path is derived from the task's own path; a stale env var must not affect it
+                    "GRADLE_PROJECT_PATH" to ":bogus",
                 )
             ) {
-                assertOutputContains("Please specify path to gradle project in GRADLE_PROJECT_PATH environment variable")
+                val shellScript = pbxFile.kotlinPhaseShellScripts().single()
+                assertContains(
+                    shellScript,
+                    "./gradlew :embedAndSignAppleFrameworkForXcode",
+                    message = "The generated script must target the task's own project path, not the legacy GRADLE_PROJECT_PATH env var",
+                )
             }
         }
     }
