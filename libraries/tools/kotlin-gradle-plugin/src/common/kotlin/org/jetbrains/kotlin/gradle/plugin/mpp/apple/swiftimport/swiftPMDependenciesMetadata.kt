@@ -19,7 +19,10 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 import org.jetbrains.kotlin.gradle.plugin.KotlinPluginLifecycle
 import org.jetbrains.kotlin.gradle.plugin.await
 import org.jetbrains.kotlin.gradle.plugin.categoryByName
+import org.jetbrains.kotlin.gradle.plugin.internal.BuildIdentifierAccessor
+import org.jetbrains.kotlin.gradle.plugin.internal.compatAccessor
 import org.jetbrains.kotlin.gradle.plugin.launch
+import org.jetbrains.kotlin.gradle.plugin.variantImplementationFactoryProvider
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeCompilation
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinUsages.KOTLIN_METADATA
 import org.jetbrains.kotlin.gradle.plugin.mpp.internal
@@ -35,7 +38,10 @@ private const val SWIFTPM_DEPENDENCIES_METADATA_USAGE = "swiftPMDependenciesMeta
 internal const val SWIFTPM_DEPENDENCIES_METADATA_FOR_LOCK_FILES_USAGE = "swiftPMDependenciesMetadataForLockFiles"
 
 @Suppress("UNCHECKED_CAST")
-private fun swiftPMDependencies(swiftPMDependenciesMetadataClasspath: ArtifactView): Provider<TransitiveSwiftPMDependencies> {
+private fun swiftPMDependencies(
+    swiftPMDependenciesMetadataClasspath: ArtifactView,
+    buildIdentifierAccessorFactory: Provider<BuildIdentifierAccessor.Factory>,
+): Provider<TransitiveSwiftPMDependencies> {
     return swiftPMDependenciesMetadataClasspath
         .artifacts.resolvedArtifacts
         .map { artifacts ->
@@ -46,7 +52,10 @@ private fun swiftPMDependencies(swiftPMDependenciesMetadataClasspath: ArtifactVi
                 }
                 .associate { resolvedArtifact ->
                     val (swiftPMPackageIdentifier, isModular) = when (val componentId = resolvedArtifact.id.componentIdentifier) {
-                        is ProjectComponentIdentifier -> componentId.projectPath to false
+                        is ProjectComponentIdentifier -> swiftPMProjectDependencyIdentifier(
+                            buildPath = componentId.build.compatAccessor(buildIdentifierAccessorFactory).buildPath,
+                            projectPath = componentId.projectPath,
+                        ) to false
                         is ModuleComponentIdentifier -> "${componentId.group}_${componentId.module}_${componentId.version}" to true
                         else -> error("Unexpected componentId: $componentId")
                     }
@@ -60,6 +69,19 @@ private fun swiftPMDependencies(swiftPMDependenciesMetadataClasspath: ArtifactVi
             TransitiveSwiftPMDependencies(metadataByDependencyIdentifier)
         }
 }
+
+/**
+ * Computes the raw identifier of a project dependency providing SwiftPM dependencies metadata.
+ *
+ * The project path alone is not unique across the build tree: e.g. the root project of every
+ * included build has the path ":", which previously collapsed every included build dependency
+ * into the identifier "_" (KT-84736). Include the build path for projects from included builds
+ * while keeping the identifiers of the current build's projects stable.
+ *
+ * The identifier is sanitized by the caller before it is used as a synthetic package name.
+ */
+internal fun swiftPMProjectDependencyIdentifier(buildPath: String, projectPath: String): String =
+    if (buildPath == ":") projectPath else "$buildPath:$projectPath"
 
 internal fun Project.swiftPMDependenciesForLockFilesScopeConfiguration(): Configuration {
     return project.configurations.maybeCreateDependencyScope("swiftPMDependenciesForLockFilesMetadataClasspathDependencies")
@@ -116,7 +138,8 @@ internal fun Project.transitiveSwiftPMDependenciesProvider(): Provider<Transitiv
         }
         // SwiftPM metadata is optional, so select it only if it exists
         it.lenient(true)
-    }
+    },
+    buildIdentifierAccessorFactory = variantImplementationFactoryProvider<BuildIdentifierAccessor.Factory>(),
 )
 
 internal fun Project.registerSwiftPMDependenciesMetadataApiElements(swiftPMDependenciesMetadata: TaskProvider<SerializeSwiftPMDependenciesMetadata>): Configuration {

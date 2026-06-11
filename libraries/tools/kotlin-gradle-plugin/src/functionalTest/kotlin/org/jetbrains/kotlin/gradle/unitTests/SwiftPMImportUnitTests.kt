@@ -23,6 +23,7 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.apple.swiftimport.GenerateSyntheti
 import org.jetbrains.kotlin.gradle.plugin.mpp.apple.swiftimport.SwiftPMImportExtension
 import org.jetbrains.kotlin.gradle.plugin.mpp.apple.swiftimport.SwiftPMDependency
 import org.jetbrains.kotlin.gradle.plugin.mpp.apple.swiftimport.SyncPackageResolvedTask
+import org.jetbrains.kotlin.gradle.plugin.mpp.apple.swiftimport.swiftPMProjectDependencyIdentifier
 import org.jetbrains.kotlin.gradle.plugin.mpp.apple.swiftimport.transitiveSwiftPMDependenciesProvider
 import org.jetbrains.kotlin.gradle.util.*
 import org.jetbrains.kotlin.gradle.utils.lowerCamelCaseName
@@ -35,6 +36,7 @@ import org.junit.jupiter.api.assertDoesNotThrow
 import kotlin.test.BeforeTest
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
+import kotlin.test.assertNotEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNotSame
 import kotlin.test.assertTrue
@@ -44,6 +46,30 @@ class SwiftPMImportUnitTests {
     @BeforeTest
     fun runOnMacOSOnly() {
         Assumptions.assumeTrue(HostManager.hostIsMac, "macOS host required for this test")
+    }
+
+    @Test
+    fun `test project dependency identifiers are unique across included builds`() {
+        // Projects of the current build keep their stable project path based identifier
+        assertEquals(":app", swiftPMProjectDependencyIdentifier(buildPath = ":", projectPath = ":app"))
+
+        // KT-84736: the root project of an included build must not collapse to just ":"
+        // (which is sanitized into the "_" package name)
+        assertEquals(":included::", swiftPMProjectDependencyIdentifier(buildPath = ":included", projectPath = ":"))
+
+        // Root projects of two different included builds must not collide
+        assertNotEquals(
+            swiftPMProjectDependencyIdentifier(buildPath = ":buildA", projectPath = ":"),
+            swiftPMProjectDependencyIdentifier(buildPath = ":buildB", projectPath = ":"),
+        )
+
+        // A subproject of an included build must not collide with a project
+        // of the current build that has the same flattened path
+        val sanitize = { identifier: String -> identifier.replace(Regex("[^a-zA-Z0-9]"), "_") }
+        assertNotEquals(
+            sanitize(swiftPMProjectDependencyIdentifier(buildPath = ":", projectPath = ":included:lib")),
+            sanitize(swiftPMProjectDependencyIdentifier(buildPath = ":included", projectPath = ":lib")),
+        )
     }
 
     @Test
