@@ -248,6 +248,10 @@ internal abstract class GenerateSyntheticLinkageImportProject : DefaultTask(), U
                         }
                     }
                     is SwiftPMDependency.Local -> {
+                        // KT-85780: pin the package name with `.package(name:path:)` so that the
+                        // `.product(name:package:)` references below resolve even when the configured
+                        // packageName differs from the name SwiftPM infers from the package directory
+                        dependencyArguments += "  name: \"${importedPackage.packageName}\""
                         val absolutePath = importedPackage.absolutePath
                         val relativePath = absolutePath.normalizedAbsoluteFile().relativeTo(packageRoot)
                         dependencyArguments += "  path: \"${relativePath.path}\""

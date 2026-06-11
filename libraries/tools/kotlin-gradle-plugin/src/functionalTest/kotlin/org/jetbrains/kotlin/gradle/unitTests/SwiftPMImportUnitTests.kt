@@ -83,6 +83,55 @@ class SwiftPMImportUnitTests {
     }
 
     @Test
+    fun `test local package custom name is emitted as package dependency name in generated manifest`() {
+        val project = swiftPMImportProject(
+            preApplyCode = {
+                val localPackageDir = project.projectDir.resolve("localSwiftPackage")
+                localPackageDir.mkdirs()
+                localPackageDir.resolve("Package.swift").writeText(
+                    """
+                    // swift-tools-version: 5.9
+                    import PackageDescription
+                    let package = Package(name: "CustomLocalSwiftPackage")
+                    """.trimIndent()
+                )
+            },
+            swiftPMDependencies = { layout ->
+                localSwiftPackage(
+                    directory = layout.projectDirectory.dir("localSwiftPackage"),
+                    products = listOf("LocalSwiftPackageB"),
+                    packageName = "CustomLocalSwiftPackage",
+                )
+            }
+        )
+        project.evaluate()
+
+        val task = project.tasks.findByName(GenerateSyntheticLinkageImportProject.syntheticImportProjectGenerationTaskName)
+        assertIs<GenerateSyntheticLinkageImportProject>(task)
+        task.generateSwiftPMSyntheticImportProjectAndFetchPackages()
+
+        val manifests = task.syntheticImportProjectRoot.get().asFile.walkTopDown()
+            .filter { it.name == "Package.swift" }
+            .map { it.readText() }
+            .toList()
+        val manifestWithLocalDependency = manifests.singleOrNull {
+            it.contains("path:") && it.contains("localSwiftPackage")
+        }
+        assertNotNull(
+            manifestWithLocalDependency,
+            "Expected a generated manifest declaring the local package dependency, manifests:\n${manifests.joinToString("\n")}"
+        )
+        assertTrue(
+            manifestWithLocalDependency.contains("name: \"CustomLocalSwiftPackage\""),
+            "Expected the local package dependency to pin the package name in .package(name:path:):\n$manifestWithLocalDependency"
+        )
+        assertTrue(
+            manifestWithLocalDependency.contains("package: \"CustomLocalSwiftPackage\""),
+            "Expected the product reference to point at the configured package name:\n$manifestWithLocalDependency"
+        )
+    }
+
+    @Test
     fun `test local package name inference from directory`() {
         val project = swiftPMImportProject(
             preApplyCode = {
