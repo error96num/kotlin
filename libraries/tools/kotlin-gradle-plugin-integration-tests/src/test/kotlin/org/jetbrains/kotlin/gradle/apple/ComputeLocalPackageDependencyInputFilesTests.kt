@@ -59,4 +59,75 @@ class ComputeLocalPackageDependencyInputFilesTests : KGPBaseTest() {
         }
     }
 
+    @GradleTest
+    fun `compute local package dependency task - dumps transitive local packages`(version: GradleVersion) {
+        project("empty", version) {
+            val packageOne = projectPath.resolve("packageOne").also { it.createDirectories() }.toFile()
+            val packageTwo = projectPath.resolve("packageTwo").also { it.createDirectories() }.toFile()
+            val packageThree = projectPath.resolve("packageThree").also { it.createDirectories() }.toFile()
+
+            runProcess(listOf("swift", "package", "init", "--type", "library"), packageOne)
+            runProcess(listOf("swift", "package", "init", "--type", "library"), packageTwo)
+            runProcess(listOf("swift", "package", "init", "--type", "library"), packageThree)
+
+            // packageOne -> packageTwo -> packageThree; only packageOne is declared directly
+            packageOne.declareLocalPackageDependency("packageOne", "packageTwo")
+            packageTwo.declareLocalPackageDependency("packageTwo", "packageThree")
+
+            plugins {
+                kotlin("multiplatform").apply(false)
+            }
+            buildScriptInjection {
+                project.tasks.register<ComputeLocalPackageDependencyInputFiles>("computePackage") {
+                    localPackages.set(listOf(packageOne))
+                    filesToTrackFromLocalPackages.set(project.layout.projectDirectory.file("result"))
+                }
+            }
+            build("computePackage")
+
+            // `swift package describe` reports canonical paths for transitive local packages,
+            // so compare canonicalized paths on both sides
+            assertEquals(
+                listOf(
+                    packageOne.resolve("Package.swift"),
+                    packageOne.resolve("Sources/packageOne"),
+                    packageTwo.resolve("Package.swift"),
+                    packageTwo.resolve("Sources/packageTwo"),
+                    packageThree.resolve("Package.swift"),
+                    packageThree.resolve("Sources/packageThree"),
+                ).map { it.canonicalFile }.prettyPrinted,
+                projectPath.resolve("result").readText().lines().map {
+                    File(it).canonicalFile
+                }.prettyPrinted
+            )
+        }
+    }
+
+    private fun File.declareLocalPackageDependency(packageName: String, dependencyName: String) {
+        resolve("Package.swift").writeText(
+            """
+            // swift-tools-version: 5.9
+            import PackageDescription
+
+            let package = Package(
+                name: "$packageName",
+                products: [
+                    .library(name: "$packageName", targets: ["$packageName"]),
+                ],
+                dependencies: [
+                    .package(path: "../$dependencyName"),
+                ],
+                targets: [
+                    .target(
+                        name: "$packageName",
+                        dependencies: [
+                            .product(name: "$dependencyName", package: "$dependencyName"),
+                        ]
+                    ),
+                ]
+            )
+            """.trimIndent()
+        )
+    }
+
 }

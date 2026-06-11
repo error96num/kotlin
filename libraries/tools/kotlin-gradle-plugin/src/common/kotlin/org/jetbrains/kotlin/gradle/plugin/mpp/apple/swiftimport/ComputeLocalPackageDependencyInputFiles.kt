@@ -13,6 +13,7 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.provider.Provider
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.*
 import org.gradle.process.ExecOperations
@@ -41,27 +42,55 @@ internal abstract class ComputeLocalPackageDependencyInputFiles : DefaultTask() 
         project.layout.buildDirectory.file("kotlin/swiftImportFilesToTrackFromLocalPackages")
     )
 
+    /**
+     * KT-84800: Recompute if the manifests of transitive local packages discovered by the previous
+     * run change. The direct package manifests are covered by [manifests]; the transitive ones are
+     * only known after execution, so we track the manifests recorded in the previous output. A
+     * change to a direct or already discovered manifest re-triggers discovery, which picks up any
+     * newly added transitive local packages.
+     */
+    @get:InputFiles
+    @get:PathSensitive(PathSensitivity.RELATIVE)
+    protected val previouslyDiscoveredManifests: Provider<List<File>>
+        get() = filesToTrackFromLocalPackages.map { output ->
+            val outputFile = output.asFile
+            if (outputFile.exists()) {
+                outputFile.readLines()
+                    .filter { it.isNotEmpty() && it.endsWith(MANIFEST_FILE_NAME) }
+                    .map(::File)
+            } else {
+                emptyList()
+            }
+        }
+
     @get:Inject
     protected abstract val execOps: ExecOperations
 
     @TaskAction
     fun generateSwiftPMSyntheticImportProjectAndFetchPackages() {
-        // FIXME: KT-84800 Fingerprint transitive local packages
-        val localPackageFiles = localPackages.get().flatMap { packageRoot ->
-            listOf(
-                packageRoot.resolve("Package.swift")
-            ) + findLocalPackageSources(packageRoot)
-        }.map {
-            it.path
+        // KT-84800: direct local packages may transitively depend on other local packages; walk
+        // the local dependency graph so that the sources of transitive local packages are
+        // fingerprinted as well.
+        val visitedPackageRoots = hashSetOf<String>()
+        val packageRootsQueue = ArrayDeque(localPackages.get())
+        val localPackageFiles = mutableListOf<File>()
+        while (packageRootsQueue.isNotEmpty()) {
+            val packageRoot = packageRootsQueue.removeFirst()
+            if (!visitedPackageRoots.add(packageRoot.canonicalPath)) continue
+            val packageDescription = describeLocalPackage(packageRoot)
+            localPackageFiles.add(packageRoot.resolve(MANIFEST_FILE_NAME))
+            localPackageFiles.addAll(findLocalPackageSources(packageRoot, packageDescription))
+            packageRootsQueue.addAll(findTransitiveLocalPackages(packageDescription))
         }
         filesToTrackFromLocalPackages.getFile().writeText(
-            localPackageFiles.joinToString("\n")
+            localPackageFiles.joinToString("\n") { it.path }
         )
     }
 
     @Serializable
     data class PackageDescription(
-        val targets: List<PackageTarget>
+        val targets: List<PackageTarget>,
+        val dependencies: List<PackageDependency> = emptyList(),
     ) {
         @Serializable
         data class PackageTarget(
@@ -69,10 +98,15 @@ internal abstract class ComputeLocalPackageDependencyInputFiles : DefaultTask() 
             val type: String,
             @kotlinx.serialization.SerialName("module_type") val moduleType: String,
         )
+
+        @Serializable
+        data class PackageDependency(
+            val type: String,
+            val path: String? = null,
+        )
     }
 
-    @Suppress("UNCHECKED_CAST")
-    private fun findLocalPackageSources(path: File): List<File> {
+    private fun describeLocalPackage(path: File): PackageDescription {
         val jsonBuffer = ByteArrayOutputStream()
         execOps.exec { exec ->
             exec.workingDir(path)
@@ -85,8 +119,10 @@ internal abstract class ComputeLocalPackageDependencyInputFiles : DefaultTask() 
                 exec.environment.remove(it)
             }
         }
-        val packageDescription = packageDescriptionJson.decodeFromStream<PackageDescription>(ByteArrayInputStream(jsonBuffer.toByteArray()))
+        return packageDescriptionJson.decodeFromStream<PackageDescription>(ByteArrayInputStream(jsonBuffer.toByteArray()))
+    }
 
+    private fun findLocalPackageSources(path: File, packageDescription: PackageDescription): List<File> {
         return packageDescription.targets.filter {
             (it.moduleType == "SwiftTarget" || it.moduleType == "ClangTarget") && it.type != "test"
         }.map {
@@ -94,8 +130,18 @@ internal abstract class ComputeLocalPackageDependencyInputFiles : DefaultTask() 
         }
     }
 
+    private fun findTransitiveLocalPackages(packageDescription: PackageDescription): List<File> {
+        return packageDescription.dependencies.mapNotNull { dependency ->
+            dependency.path?.takeIf {
+                dependency.type == FILE_SYSTEM_DEPENDENCY_TYPE
+            }?.let(::File)
+        }
+    }
+
     companion object {
         const val TASK_NAME = "computeLocalPackageDependencyInputFiles"
+        private const val MANIFEST_FILE_NAME = "Package.swift"
+        private const val FILE_SYSTEM_DEPENDENCY_TYPE = "fileSystem"
         private val packageDescriptionJson = Json {
             ignoreUnknownKeys = true
         }
