@@ -257,6 +257,21 @@ internal abstract class XcodebuildDefFileWorkAction @Inject constructor(
                     appendLine("... and ${errorLines.size - MAX_REPORTED_ERROR_LINES} more error(s).")
                 }
             }
+            // KT-83875: SwiftPM reports an unknown product name with an error that doesn't explain
+            // where the product name comes from in a KGP build. Map it back to the Gradle DSL.
+            val missingProducts = errorLines.mapNotNull { line ->
+                PRODUCT_NOT_FOUND_REGEX.find(line)?.groupValues?.get(1)
+            }.distinct()
+            if (missingProducts.isNotEmpty()) {
+                val productList = missingProducts.joinToString(", ") { "'$it'" }
+                appendLine(
+                    """
+                    The SwiftPM product(s) $productList declared in the 'swiftPMDependencies { }' block were not found in the imported packages.
+                    Product names are case-sensitive and must exactly match a product declared in the 'products' section of the dependency's Package.swift.
+                    Please check the product names passed to 'products = listOf(product("..."))' against the products the package actually provides.
+                    """.trimIndent()
+                )
+            }
             append("The full xcodebuild output is available at: ${xcodebuildLog.path}")
         }
     }
@@ -289,6 +304,10 @@ internal abstract class XcodebuildDefFileWorkAction @Inject constructor(
         // Matches both build system errors ("xcodebuild: error: ...") and compiler/SwiftPM errors ("<location>: error: ...")
         private val XCODEBUILD_ERROR_LINE_REGEX = Regex("(^|\\s)error: ")
         private const val MAX_REPORTED_ERROR_LINES = 20
+
+        // SwiftPM dependency resolution error for a product that doesn't exist in the imported package, e.g.:
+        // "error: product 'FirebaseCoreee' required by package 'kotlinmultiplatformlinkedpackage' target 'KotlinMultiplatformLinkedPackage' not found."
+        private val PRODUCT_NOT_FOUND_REGEX = Regex("product '([^']+)' required by package '[^']+' target '[^']+' not found")
     }
 }
 
