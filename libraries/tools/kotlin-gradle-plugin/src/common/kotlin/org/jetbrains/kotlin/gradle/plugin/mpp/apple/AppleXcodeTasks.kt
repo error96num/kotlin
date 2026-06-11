@@ -289,22 +289,32 @@ internal fun Project.registerEmbedAndSignAppleFrameworkTask(framework: Framework
     framework.linkTaskProvider.dependsOn(sandBoxTask)
 
     if (!project.kotlinPropertiesProvider.disableSwiftPMImport) {
-        val xcodeProjectPathForKmpIJPlugin = locateOrRegisterSwiftPMDependenciesExtension().xcodeProjectPathForKmpIJPlugin
-        val envProjectPath = project.providers.environmentVariable(PROJECT_FILE_PATH_ENV)
         val projectPath = callingProjectPathProvider()
         val regenerateSyntheticLinkageProject = locateOrRegisterRegenerateLinkageImportProjectTask()
         regenerateSyntheticLinkageProject.configure {
             it.doFirst {
-                if (!envProjectPath.isPresent && !xcodeProjectPathForKmpIJPlugin.isPresent) {
+                // The task executes only when there are direct or transitive SwiftPM dependencies; linking them through the
+                // synthetic linkage package requires knowing the path of the calling Xcode project
+                if (!projectPath.isPresent) {
                     error("Please make sure $PROJECT_FILE_PATH_ENV environment variable is present")
                 }
             }
+            /**
+             * The calling Xcode project path is known only when xcodebuild exports PROJECT_FILE_PATH (or when the KMP IDE plugin
+             * provides the path explicitly). Builds that run the embedAndSign integration without xcodebuild (e.g. integration
+             * tests that emulate the Xcode environment variables) don't have it.
+             *
+             * In that case the output location must stay resolvable at its default value because Gradle resolves task output
+             * locations and stores them in the configuration cache even when the task is going to be skipped by its onlyIf spec.
+             * Nothing is ever generated at the default location: when the task actually executes without a known Xcode project,
+             * the doFirst check above fails it with an actionable error first: KT-84215
+             */
             it.syntheticImportProjectRoot.set(
-                projectPath.flatMap {
-                    project.layout.dir(
-                        project.provider { File(it).parentFile.resolve(SYNTHETIC_IMPORT_TARGET_MAGIC_NAME) }
-                    )
-                }
+                project.layout.dir(
+                    projectPath.map { File(it).parentFile.resolve(SYNTHETIC_IMPORT_TARGET_MAGIC_NAME) }
+                ).orElse(
+                    project.layout.buildDirectory.dir(GenerateSyntheticLinkageImportProject.DEFAULT_SYNTHETIC_IMPORT_PROJECT_ROOT_PATH)
+                )
             )
         }
 
@@ -640,10 +650,7 @@ private fun Project.callingProjectPathProvider(): Provider<String> {
     return envProjectPath.orElse(
         xcodeProjectPathForKmpIJPlugin.map {
             it.asFile.path
-        }.orElse(
-            // FIXME: KT-84215 This is a stub to unblock integration tests. We need to rework how integration tests that ran without an Xcode project will function
-            project.layout.projectDirectory.asFile.path
-        )
+        }
     )
 }
 

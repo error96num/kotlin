@@ -485,6 +485,42 @@ class SwiftPMImportXcodeIntegrationIT : KGPBaseTest() {
     }
 
     @GradleTest
+    fun `KT-84215 - embedAndSign without Xcode project fails actionably when SwiftPM dependencies are present`(version: GradleVersion) {
+        project("emptyxcode", version) {
+            initDefaultKmpWithLocalSPM()
+
+            val xcodeBuildOutput = projectPath.resolve("build/xcodeOutput")
+            // Emulate an embedAndSign invocation outside of xcodebuild: Xcode build settings are present,
+            // but PROJECT_FILE_PATH (which xcodebuild exports) is not.
+            val embedAndSignEnvironment = EnvironmentalVariables(
+                "CONFIGURATION" to "Debug",
+                "ARCHS" to "arm64",
+                "SDK_NAME" to "iphonesimulator",
+                "FRAMEWORKS_FOLDER_PATH" to "Frameworks",
+                "TARGET_BUILD_DIR" to xcodeBuildOutput.absolutePathString(),
+                "BUILT_PRODUCTS_DIR" to xcodeBuildOutput.absolutePathString(),
+            )
+
+            buildAndFail(
+                "embedAndSignAppleFrameworkForXcode",
+                environmentVariables = embedAndSignEnvironment,
+            ) {
+                assertOutputContains("Please make sure PROJECT_FILE_PATH environment variable is present")
+            }
+
+            // Even with the Xcode integration check suppressed, regenerating the linkage package must
+            // surface the same actionable error instead of an opaque missing provider value failure
+            buildAndFail(
+                "embedAndSignAppleFrameworkForXcode",
+                "-Pkotlin.suppressSwiftPMXcodeIntegrationCheck=true",
+                environmentVariables = embedAndSignEnvironment,
+            ) {
+                assertOutputContains("Please make sure PROJECT_FILE_PATH environment variable is present")
+            }
+        }
+    }
+
+    @GradleTest
     fun `integrateLinkagePackage reruns synthetic manifest generation when new Package is added`(version: GradleVersion) {
         project("emptyxcode", version) {
             val includeSecondPackageProp = "includeSecondPackage"

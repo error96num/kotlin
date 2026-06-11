@@ -40,7 +40,7 @@ internal abstract class GenerateSyntheticLinkageImportProject : DefaultTask(), U
 
     @get:Internal
     val syntheticImportProjectRoot: DirectoryProperty = project.objects.directoryProperty().convention(
-        project.layout.buildDirectory.dir("kotlin/swiftImport")
+        project.layout.buildDirectory.dir(DEFAULT_SYNTHETIC_IMPORT_PROJECT_ROOT_PATH)
     )
 
     @get:OutputFiles
@@ -397,6 +397,7 @@ internal abstract class GenerateSyntheticLinkageImportProject : DefaultTask(), U
         const val SYNTHETIC_IMPORT_DYLIB = "KotlinMultiplatformLinkedPackageDylib"
         const val SUBPACKAGES = "subpackages"
         const val MANIFEST_NAME = "Package.swift"
+        const val DEFAULT_SYNTHETIC_IMPORT_PROJECT_ROOT_PATH = "kotlin/swiftImport"
 
         val syntheticImportProjectGenerationTaskName = lowerCamelCaseName(
             TASK_NAME,
