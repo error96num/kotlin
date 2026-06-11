@@ -100,6 +100,85 @@ class SwiftPMImportKotlinNativeTestTask : KGPBaseTest() {
         }
     }
 
+    @GradleTest
+    fun `KT-84794 - macOS test task runs against a dynamic SwiftPM product`(version: GradleVersion) {
+        project("empty", version) {
+            val dynamicProduct = projectPath.resolve("DynamicProduct").also { it.createDirectories() }.toFile()
+            runProcess(listOf("swift", "package", "init", "--type", "library"), dynamicProduct)
+            dynamicProduct.resolve("Package.swift").writeText(
+                """
+                    // swift-tools-version: 5.9
+                    import PackageDescription
+
+                    let package = Package(
+                        name: "DynamicProduct",
+                        products: [
+                            .library(
+                                name: "DynamicProduct",
+                                type: .dynamic,
+                                targets: ["DynamicProduct"]
+                            ),
+                        ],
+                        targets: [
+                            .target(
+                                name: "DynamicProduct"
+                            ),
+                        ]
+                    )
+                """.trimIndent()
+            )
+            dynamicProduct.resolve("Sources/DynamicProduct/DynamicProduct.swift").writeText(
+                """
+                    import Foundation
+                    @objc public class LocalHelper: NSObject {
+                        @objc public static func greeting() -> String {
+                            return "Hello from dynamic product on macOS"
+                        }
+                    }
+                """.trimIndent()
+            )
+
+            plugins {
+                kotlin("multiplatform")
+            }
+
+            buildScriptInjection {
+                project.applyMultiplatform {
+                    macosArm64()
+
+                    sourceSets.macosArm64Test.get().compileSource(
+                        """
+                        import kotlin.test.*
+                        import swiftPMImport.empty.LocalHelper
+
+                        class DynamicProductTest {
+                            @Test
+                            fun test() {
+                                @OptIn(kotlinx.cinterop.ExperimentalForeignApi::class)
+                                println(LocalHelper.greeting())
+                            }
+                        }
+
+                        """.trimIndent()
+                    )
+
+                    swiftPMDependencies {
+                        localSwiftPackage(
+                            directory = project.layout.projectDirectory.dir("DynamicProduct"),
+                            products = listOf("DynamicProduct")
+                        )
+                    }
+                }
+            }
+
+            // macOS host tests load dynamic products through DYLD_FALLBACK_* envs,
+            // unlike simulator tests which pass them through SIMCTL_CHILD_DYLD_* envs
+            build(":macosArm64Test") {
+                assertOutputContains("Hello from dynamic product on macOS")
+            }
+        }
+    }
+
     @GradleTestVersions(minVersion = TestVersions.Gradle.G_8_0)
     @GradleTest
     fun `KT-85114 - incremental linkage smoke test`(version: GradleVersion) {
