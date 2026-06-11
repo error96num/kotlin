@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.gradle.plugin.mpp.apple.swiftimport
 
+import org.gradle.api.GradleException
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.logging.Logging
@@ -22,6 +23,7 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.apple.swiftimport.XcodebuildDefFil
 import org.jetbrains.kotlin.gradle.utils.getFile
 import org.jetbrains.kotlin.gradle.utils.listFilesOrEmpty
 import java.io.File
+import java.io.OutputStream
 import javax.inject.Inject
 
 internal interface XcodebuildDefFileWorkParameters : WorkParameters {
@@ -123,46 +125,58 @@ internal abstract class XcodebuildDefFileWorkAction @Inject constructor(
             forceClangToReexecute.deleteRecursively()
         }
 
-        execOps.exec { exec ->
-            exec.workingDir(projectRoot)
-            val args = mutableListOf(
-                "xcodebuild", "build",
-                "-scheme", GenerateSyntheticLinkageImportProject.SYNTHETIC_IMPORT_TARGET_MAGIC_NAME,
-                "-destination", "generic/platform=${parameters.xcodebuildPlatform.get()}",
-                "-derivedDataPath", dd.path,
-                FetchSyntheticImportProjectPackages.XCODEBUILD_SWIFTPM_CHECKOUT_PATH_PARAMETER,
-                parameters.swiftPMDependenciesCheckout.getFile().path,
-                "CC=${clangArgsDumpScript.path}",
-                "LD=${ldArgsDumpScript.path}",
-                "ARCHS=${targetArchitectures.joinToString(" ")}",
-                "CODE_SIGN_IDENTITY=",
-                "COMPILER_INDEX_STORE_ENABLE=NO",
-                "SWIFT_INDEX_STORE_ENABLE=NO",
-            )
+        // KT-83682: Tee the xcodebuild output into a log file, so the relevant error lines can be
+        // surfaced directly in the failure message instead of being buried in the streamed task output.
+        val xcodebuildLog = dumpIntermediates.resolve("xcodebuild.log")
+        val execResult = xcodebuildLog.outputStream().use { logStream ->
+            execOps.exec { exec ->
+                exec.workingDir(projectRoot)
+                val args = mutableListOf(
+                    "xcodebuild", "build",
+                    "-scheme", GenerateSyntheticLinkageImportProject.SYNTHETIC_IMPORT_TARGET_MAGIC_NAME,
+                    "-destination", "generic/platform=${parameters.xcodebuildPlatform.get()}",
+                    "-derivedDataPath", dd.path,
+                    FetchSyntheticImportProjectPackages.XCODEBUILD_SWIFTPM_CHECKOUT_PATH_PARAMETER,
+                    parameters.swiftPMDependenciesCheckout.getFile().path,
+                    "CC=${clangArgsDumpScript.path}",
+                    "LD=${ldArgsDumpScript.path}",
+                    "ARCHS=${targetArchitectures.joinToString(" ")}",
+                    "CODE_SIGN_IDENTITY=",
+                    "COMPILER_INDEX_STORE_ENABLE=NO",
+                    "SWIFT_INDEX_STORE_ENABLE=NO",
+                )
 
-            args.addAll(parameters.additionalXcodeArgs.get())
+                args.addAll(parameters.additionalXcodeArgs.get())
 
-            exec.commandLine(args)
+                exec.commandLine(args)
 
-            exec.environment(KOTLIN_CLANG_ARGS_DUMP_FILE_ENV, clangArgsDump)
-            exec.environment(KOTLIN_LD_ARGS_DUMP_FILE_ENV, ldArgsDump)
+                exec.standardOutput = TeeOutputStream(System.out, logStream)
+                exec.errorOutput = TeeOutputStream(System.err, logStream)
+                exec.isIgnoreExitValue = true
 
-            val environmentToFilter = listOf(
-                "EMBED_PACKAGE_RESOURCE_BUNDLE_NAMES",
-            ) + AppleSdk.xcodeEnvironmentDebugDylibVars
-            environmentToFilter.forEach {
-                if (exec.environment.containsKey(it)) {
+                exec.environment(KOTLIN_CLANG_ARGS_DUMP_FILE_ENV, clangArgsDump)
+                exec.environment(KOTLIN_LD_ARGS_DUMP_FILE_ENV, ldArgsDump)
+
+                val environmentToFilter = listOf(
+                    "EMBED_PACKAGE_RESOURCE_BUNDLE_NAMES",
+                ) + AppleSdk.xcodeEnvironmentDebugDylibVars
+                environmentToFilter.forEach {
+                    if (exec.environment.containsKey(it)) {
+                        exec.environment.remove(it)
+                    }
+                }
+                exec.environment.keys.filter {
+                    // ScanDependencies explode with duplicate modules because it reads this env for some reason
+                    it.startsWith("OTHER_")
+                            // Also some asset catalogs utility explodes
+                            || it.startsWith("ASSETCATALOG_")
+                }.forEach {
                     exec.environment.remove(it)
                 }
             }
-            exec.environment.keys.filter {
-                // ScanDependencies explode with duplicate modules because it reads this env for some reason
-                it.startsWith("OTHER_")
-                        // Also some asset catalogs utility explodes
-                        || it.startsWith("ASSETCATALOG_")
-            }.forEach {
-                exec.environment.remove(it)
-            }
+        }
+        if (execResult.exitValue != 0) {
+            throw GradleException(xcodebuildFailureMessage(execResult.exitValue, xcodebuildLog))
         }
 
         val discoverModulesImplicitly = parameters.discoverModulesImplicitly.get()
@@ -222,6 +236,31 @@ internal abstract class XcodebuildDefFileWorkAction @Inject constructor(
         }
     }
 
+    /**
+     * KT-83682: Build a failure message that contains the actual xcodebuild error lines, so the
+     * error is understandable directly from the build failure instead of requiring the user to
+     * search through the streamed xcodebuild output in the build log.
+     */
+    private fun xcodebuildFailureMessage(exitValue: Int, xcodebuildLog: File): String {
+        val errorLines = if (xcodebuildLog.isFile) {
+            xcodebuildLog.readLines()
+                .map { it.trim() }
+                .filter { XCODEBUILD_ERROR_LINE_REGEX.containsMatchIn(it) }
+                .distinct()
+        } else emptyList()
+        return buildString {
+            appendLine("xcodebuild failed with exit code $exitValue while building the synthetic SwiftPM import project.")
+            if (errorLines.isNotEmpty()) {
+                appendLine("Errors reported by xcodebuild:")
+                errorLines.take(MAX_REPORTED_ERROR_LINES).forEach { appendLine(it) }
+                if (errorLines.size > MAX_REPORTED_ERROR_LINES) {
+                    appendLine("... and ${errorLines.size - MAX_REPORTED_ERROR_LINES} more error(s).")
+                }
+            }
+            append("The full xcodebuild output is available at: ${xcodebuildLog.path}")
+        }
+    }
+
     // KT-85468: Stub outputs identical to the "no dependencies" branch, used as fallback on sync failure.
     private fun writeStubOutputs(
         architectures: Set<AppleArchitecture>,
@@ -245,4 +284,39 @@ internal abstract class XcodebuildDefFileWorkAction @Inject constructor(
             ldDumpDir.resolve(XcodebuildDefFileUtils.librarySearchpathFileName(architecture)).writeText("\n")
         }
     }
+
+    companion object {
+        // Matches both build system errors ("xcodebuild: error: ...") and compiler/SwiftPM errors ("<location>: error: ...")
+        private val XCODEBUILD_ERROR_LINE_REGEX = Regex("(^|\\s)error: ")
+        private const val MAX_REPORTED_ERROR_LINES = 20
+    }
+}
+
+/**
+ * Duplicates the xcodebuild output: it stays streamed into the build log via [primary], while
+ * [logFileStream] persists it for the failure message rendering. Writes are synchronized on
+ * [logFileStream] because stdout and stderr are pumped concurrently into the same log file.
+ */
+private class TeeOutputStream(
+    private val primary: OutputStream,
+    private val logFileStream: OutputStream,
+) : OutputStream() {
+    override fun write(b: Int) = synchronized(logFileStream) {
+        primary.write(b)
+        logFileStream.write(b)
+    }
+
+    override fun write(b: ByteArray, off: Int, len: Int) = synchronized(logFileStream) {
+        primary.write(b, off, len)
+        logFileStream.write(b, off, len)
+    }
+
+    override fun flush() = synchronized(logFileStream) {
+        primary.flush()
+        logFileStream.flush()
+    }
+
+    // Don't close the streams: the primary stream is the process-wide stdout/stderr and the log
+    // file stream is shared between the stdout and stderr pumps and closed by the caller.
+    override fun close() = flush()
 }
