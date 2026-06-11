@@ -21,6 +21,8 @@ internal object SwiftImportManifestGenerator {
      * @param platforms List of platform strings (e.g., ".iOS(\"15.0\")")
      * @param repoDependencies List of package dependency declarations
      * @param targetDependencies List of target dependency declarations
+     * @param headerComments Explanatory comment lines emitted right after the swift-tools-version line.
+     *   Each entry is rendered as a `//` comment line; empty entries render as a bare `//` line
      * @return The complete Package.swift manifest content
      */
     fun generateManifest(
@@ -30,8 +32,13 @@ internal object SwiftImportManifestGenerator {
         repoDependencies: List<String>,
         targetDependencies: List<String>,
         binaryTargets: List<String> = emptyList(),
+        headerComments: List<String> = emptyList(),
     ): String = buildStringBlock(defaultIndent = "  ") {
+        // The swift-tools-version declaration must remain on the first line of the manifest
         line("// swift-tools-version: 5.9")
+        headerComments.forEach { comment ->
+            line(if (comment.isEmpty()) "//" else "// $comment")
+        }
         line("import PackageDescription")
         block("let package = Package(", ")") {
             commaSeparatedEntries {

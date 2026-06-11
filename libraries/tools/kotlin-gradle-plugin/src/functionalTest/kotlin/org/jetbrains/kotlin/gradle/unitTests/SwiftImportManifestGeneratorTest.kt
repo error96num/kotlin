@@ -285,4 +285,52 @@ class SwiftImportManifestGeneratorTest {
 
         assertEquals(expected, manifest)
     }
+
+    @Test
+    fun `test manifest with header comments emitted after tools version line`() {
+        val manifest = SwiftImportManifestGenerator.generateManifest(
+            identifier = "CommentedPackage",
+            productType = ".none",
+            platforms = listOf(".iOS(\"15.0\")"),
+            repoDependencies = emptyList(),
+            targetDependencies = emptyList(),
+            headerComments = listOf(
+                "",
+                "This package is generated. Do not edit manually.",
+                "",
+            ),
+        )
+
+        val expected = """
+            |// swift-tools-version: 5.9
+            |//
+            |// This package is generated. Do not edit manually.
+            |//
+            |import PackageDescription
+            |let package = Package(
+            |  name: "CommentedPackage",
+            |  platforms: [
+            |    .iOS("15.0")
+            |  ],
+            |  products: [
+            |    .library(
+            |      name: "CommentedPackage",
+            |      type: .none,
+            |      targets: ["CommentedPackage"]
+            |    )
+            |  ],
+            |  dependencies: [
+            |  ],
+            |  targets: [
+            |    .target(
+            |      name: "CommentedPackage",
+            |      dependencies: [
+            |      ]
+            |    )
+            |  ]
+            |)
+            |""".trimMargin()
+
+        assertEquals(expected, manifest)
+    }
 }
