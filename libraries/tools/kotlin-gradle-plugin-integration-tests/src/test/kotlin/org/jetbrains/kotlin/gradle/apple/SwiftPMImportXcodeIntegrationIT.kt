@@ -429,6 +429,49 @@ class SwiftPMImportXcodeIntegrationIT : KGPBaseTest() {
     }
 
     @GradleTest
+    fun `KT-83896 - generated linkage package files are read-only and can be regenerated`(version: GradleVersion) {
+        project("emptyxcode", version, buildOptions = defaultBuildOptions.disableConfigurationCacheForGradle7(version)) {
+            initDefaultKmpWithLocalSPM()
+
+            build(
+                "integrateLinkagePackage",
+                environmentVariables = EnvironmentalVariables(
+                    "XCODEPROJ_PATH" to "iosApp/iosApp.xcodeproj",
+                )
+            )
+
+            val syntheticRoot = projectPath.resolve("iosApp/$SYNTHETIC_IMPORT_TARGET_MAGIC_NAME")
+            val generatedFiles = listOf(
+                syntheticRoot.resolve("Package.swift"),
+                syntheticRoot.resolve("Sources/$SYNTHETIC_IMPORT_TARGET_MAGIC_NAME/$SYNTHETIC_IMPORT_TARGET_MAGIC_NAME.m"),
+                syntheticRoot.resolve("Sources/$SYNTHETIC_IMPORT_TARGET_MAGIC_NAME/include/$SYNTHETIC_IMPORT_TARGET_MAGIC_NAME.h"),
+            )
+            generatedFiles.forEach { generatedFile ->
+                assertTrue(generatedFile.exists(), "expected generated file at $generatedFile")
+                assertFalse(
+                    generatedFile.toFile().canWrite(),
+                    "generated file $generatedFile should be read-only to discourage manual edits (KT-83896)",
+                )
+            }
+
+            // Regeneration must succeed even though the previously generated files are read-only
+            build(
+                "integrateLinkagePackage",
+                environmentVariables = EnvironmentalVariables(
+                    "XCODEPROJ_PATH" to "iosApp/iosApp.xcodeproj",
+                )
+            ) {
+                generatedFiles.forEach { generatedFile ->
+                    assertFalse(
+                        generatedFile.toFile().canWrite(),
+                        "generated file $generatedFile should stay read-only after regeneration (KT-83896)",
+                    )
+                }
+            }
+        }
+    }
+
+    @GradleTest
     fun `KT-86155 - forEmbedAndSignLinkage prints changed files when linkage package is mutated`(version: GradleVersion) {
         project("emptyxcode", version, buildOptions = defaultBuildOptions.disableConfigurationCacheForGradle7(version)) {
             initDefaultKmpWithLocalSPM()
@@ -448,6 +491,8 @@ class SwiftPMImportXcodeIntegrationIT : KGPBaseTest() {
                 "Sources/$SYNTHETIC_IMPORT_TARGET_MAGIC_NAME/$SYNTHETIC_IMPORT_TARGET_MAGIC_NAME.m"
             )
             assertTrue(mutatedFile.exists(), "expected generated synthetic source file at $mutatedFile")
+            // KT-83896: generated files are read-only; simulate a user forcefully tampering with the file
+            mutatedFile.toFile().setWritable(true)
             mutatedFile.writeText("// tampered content - KT-86155 reproducer")
 
             val taskName = ":generateSyntheticLinkageSwiftPMImportProjectForEmbedAndSignLinkage"

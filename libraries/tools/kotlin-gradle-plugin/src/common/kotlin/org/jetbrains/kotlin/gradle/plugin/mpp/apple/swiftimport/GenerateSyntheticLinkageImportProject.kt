@@ -338,9 +338,7 @@ internal abstract class GenerateSyntheticLinkageImportProject : DefaultTask(), U
         }
 
         val manifest = packageRoot.resolve(MANIFEST_NAME)
-        manifest.also {
-            it.parentFile.mkdirs()
-        }.writeText(
+        manifest.writeGeneratedFile(
             SwiftImportManifestGenerator.generateManifest(
                 identifier = identifier,
                 productType = productType,
@@ -354,12 +352,26 @@ internal abstract class GenerateSyntheticLinkageImportProject : DefaultTask(), U
         val objcSource = "Sources/${identifier}/${identifier}.m"
         val objcHeader = "Sources/${identifier}/include/${identifier}.h"
         // Generate ObjC sources specifically because the next CC-overriding step relies on passing a clang shim to dump compiler arguments
-        packageRoot.resolve(objcSource).also {
-            it.parentFile.mkdirs()
-        }.writeText("")
-        packageRoot.resolve(objcHeader).also {
-            it.parentFile.mkdirs()
-        }.writeText("")
+        packageRoot.resolve(objcSource).writeGeneratedFile("")
+        packageRoot.resolve(objcHeader).writeGeneratedFile("")
+    }
+
+    /**
+     * KT-83896: The generated package is not intended for user-code compilation, so the generated
+     * files are marked read-only to discourage adding sources or editing the manifest manually.
+     * Manual modifications would be silently overwritten by the next regeneration (or fail the
+     * build when the package is consumed by Xcode and [failOnNonIdempotentChanges] is enabled).
+     *
+     * The write permission is restored before regenerating so that previously generated
+     * (read-only) files can be overwritten.
+     */
+    private fun File.writeGeneratedFile(text: String) {
+        parentFile.mkdirs()
+        if (exists()) {
+            setWritable(true, true)
+        }
+        writeText(text)
+        setWritable(false, false)
     }
 
     /**
