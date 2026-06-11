@@ -337,6 +337,14 @@ internal abstract class GenerateSyntheticLinkageImportProject : DefaultTask(), U
             SyntheticProductType.INFERRED -> ".none"
         }
 
+        // KT-85404: `.package(..., traits:)` requires tools version 6.1, but bump it only when
+        // traits are actually used to keep the toolchain requirement low for everyone else
+        val toolsVersion = if (directlyImportedSwiftPMDependencies.any { it.traits.isNotEmpty() }) {
+            SwiftImportManifestGenerator.TOOLS_VERSION_WITH_TRAITS
+        } else {
+            SwiftImportManifestGenerator.DEFAULT_TOOLS_VERSION
+        }
+
         val manifest = packageRoot.resolve(MANIFEST_NAME)
         manifest.also {
             it.parentFile.mkdirs()
@@ -347,7 +355,8 @@ internal abstract class GenerateSyntheticLinkageImportProject : DefaultTask(), U
                 platforms = platforms,
                 repoDependencies = repoDependencies,
                 targetDependencies = targetDependencies + binaryTargetDependencies,
-                binaryTargets = binaryTargets
+                binaryTargets = binaryTargets,
+                toolsVersion = toolsVersion,
             )
         )
 

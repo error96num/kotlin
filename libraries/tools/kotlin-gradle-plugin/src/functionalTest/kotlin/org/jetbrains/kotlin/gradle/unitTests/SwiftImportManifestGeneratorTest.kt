@@ -285,4 +285,49 @@ class SwiftImportManifestGeneratorTest {
 
         assertEquals(expected, manifest)
     }
+
+    @Test
+    fun `test manifest with explicit tools version for traits`() {
+        val manifest = SwiftImportManifestGenerator.generateManifest(
+            identifier = "TraitsPackage",
+            productType = ".none",
+            platforms = listOf(".iOS(\"15.0\")"),
+            repoDependencies = listOf(
+                ".package(url: \"https://github.com/example/repo\", from: \"1.0.0\", traits: [\"trait1\"])"
+            ),
+            targetDependencies = listOf(".product(name: \"ExampleLib\", package: \"repo\")"),
+            toolsVersion = SwiftImportManifestGenerator.TOOLS_VERSION_WITH_TRAITS,
+        )
+
+        val expected = """
+            |// swift-tools-version: 6.1
+            |import PackageDescription
+            |let package = Package(
+            |  name: "TraitsPackage",
+            |  platforms: [
+            |    .iOS("15.0")
+            |  ],
+            |  products: [
+            |    .library(
+            |      name: "TraitsPackage",
+            |      type: .none,
+            |      targets: ["TraitsPackage"]
+            |    )
+            |  ],
+            |  dependencies: [
+            |    .package(url: "https://github.com/example/repo", from: "1.0.0", traits: ["trait1"])
+            |  ],
+            |  targets: [
+            |    .target(
+            |      name: "TraitsPackage",
+            |      dependencies: [
+            |        .product(name: "ExampleLib", package: "repo")
+            |      ]
+            |    )
+            |  ]
+            |)
+            |""".trimMargin()
+
+        assertEquals(expected, manifest)
+    }
 }

@@ -13,6 +13,15 @@ import org.jetbrains.kotlin.gradle.utils.emitListItems
  * Generates Package.swift manifest content for Swift Import synthetic packages.
  */
 internal object SwiftImportManifestGenerator {
+    /** The swift-tools-version used for generated manifests by default. */
+    const val DEFAULT_TOOLS_VERSION = "5.9"
+
+    /**
+     * The minimal swift-tools-version that supports SwiftPM traits:
+     * `.package(..., traits:)` and `Trait` were introduced in PackageDescription 6.1.
+     */
+    const val TOOLS_VERSION_WITH_TRAITS = "6.1"
+
     /**
      * Generates the content of a Package.swift manifest file.
      *
@@ -21,6 +30,7 @@ internal object SwiftImportManifestGenerator {
      * @param platforms List of platform strings (e.g., ".iOS(\"15.0\")")
      * @param repoDependencies List of package dependency declarations
      * @param targetDependencies List of target dependency declarations
+     * @param toolsVersion The swift-tools-version to emit at the top of the manifest
      * @return The complete Package.swift manifest content
      */
     fun generateManifest(
@@ -30,8 +40,9 @@ internal object SwiftImportManifestGenerator {
         repoDependencies: List<String>,
         targetDependencies: List<String>,
         binaryTargets: List<String> = emptyList(),
+        toolsVersion: String = DEFAULT_TOOLS_VERSION,
     ): String = buildStringBlock(defaultIndent = "  ") {
-        line("// swift-tools-version: 5.9")
+        line("// swift-tools-version: $toolsVersion")
         line("import PackageDescription")
         block("let package = Package(", ")") {
             commaSeparatedEntries {
