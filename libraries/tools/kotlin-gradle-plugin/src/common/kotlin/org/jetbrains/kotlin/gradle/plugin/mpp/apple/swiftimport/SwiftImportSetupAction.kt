@@ -31,6 +31,7 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.apple.swiftimport.GenerateSyntheti
 import org.jetbrains.kotlin.gradle.plugin.mpp.apple.swiftimport.GenerateSyntheticLinkageImportProject.SyntheticProductType
 import org.jetbrains.kotlin.gradle.plugin.mpp.apple.swiftimport.SwiftPMDependency.Platform
 import org.jetbrains.kotlin.gradle.plugin.testTaskName
+import org.jetbrains.kotlin.gradle.targets.native.KonanPropertiesBuildService
 import org.jetbrains.kotlin.gradle.targets.native.tasks.KotlinNativeSimulatorTest
 import org.jetbrains.kotlin.gradle.targets.native.tasks.KotlinNativeTest
 import org.jetbrains.kotlin.gradle.tasks.CInteropProcess
@@ -67,6 +68,9 @@ internal val SwiftImportSetupAction = KotlinProjectSetupAction {
 
     val isMacOSHost = HostManager.hostIsMac
     val ideaSyncEnabled = project.isInIdeaSync
+
+    // KT-86663: GenerateSyntheticLinkageImportProject reads deployment target defaults from konan.properties
+    KonanPropertiesBuildService.registerIfAbsent(project)
 
     inheritSwiftPMDependenciesFromAppleCompilationDependencies()
 

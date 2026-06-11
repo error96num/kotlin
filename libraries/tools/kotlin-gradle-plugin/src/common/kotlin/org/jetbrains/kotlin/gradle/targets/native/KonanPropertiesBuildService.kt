@@ -20,6 +20,7 @@ import org.jetbrains.kotlin.gradle.tasks.withType
 import org.jetbrains.kotlin.gradle.utils.SingleActionPerProject
 import org.jetbrains.kotlin.gradle.utils.registerClassLoaderScopedBuildService
 import org.jetbrains.kotlin.konan.properties.resolvablePropertyList
+import org.jetbrains.kotlin.konan.properties.resolvablePropertyString
 import org.jetbrains.kotlin.konan.target.Distribution
 import org.jetbrains.kotlin.konan.target.HostManager
 import org.jetbrains.kotlin.konan.target.KonanTarget
@@ -69,6 +70,13 @@ abstract class KonanPropertiesBuildService : BuildService<KonanPropertiesBuildSe
 
     internal fun additionalCacheFlags(target: KonanTarget): List<String> =
         properties.resolvablePropertyList("additionalCacheFlags", target.visibleName)
+
+    /**
+     * The minimum OS version supported by the Kotlin/Native distribution for [target],
+     * as declared by `osVersionMin.<target>` in konan.properties.
+     */
+    internal fun targetMinimalOsVersion(target: KonanTarget): String? =
+        properties.resolvablePropertyString("osVersionMin", target.visibleName)
 
     internal val environmentBlacklist: Set<String> by lazy {
         val envBlacklistFile = parameters.konanHome.get().asFile.resolve("tools/env_blacklist")

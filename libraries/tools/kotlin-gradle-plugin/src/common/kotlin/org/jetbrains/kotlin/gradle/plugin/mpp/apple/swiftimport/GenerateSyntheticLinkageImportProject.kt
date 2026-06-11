@@ -16,6 +16,7 @@ import org.gradle.process.ExecOperations
 import org.gradle.work.DisableCachingByDefault
 import org.jetbrains.kotlin.gradle.plugin.statistics.UsesBuildFusService
 import org.jetbrains.kotlin.gradle.targets.js.npm.SemVer
+import org.jetbrains.kotlin.gradle.targets.native.UsesKonanPropertiesBuildService
 import org.jetbrains.kotlin.gradle.utils.appendLine
 import org.jetbrains.kotlin.gradle.utils.lowerCamelCaseName
 import org.jetbrains.kotlin.gradle.utils.normalizedAbsoluteFile
@@ -27,7 +28,8 @@ import java.io.Serializable
 import javax.inject.Inject
 
 @DisableCachingByDefault(because = "KT-84827 - SwiftPM import doesn't support caching yet")
-internal abstract class GenerateSyntheticLinkageImportProject : DefaultTask(), UsesBuildFusService {
+internal abstract class GenerateSyntheticLinkageImportProject : DefaultTask(), UsesBuildFusService,
+    UsesKonanPropertiesBuildService {
 
     @get:Input
     protected abstract val directlyImportedDependencies: SetProperty<SwiftPMDependency>
@@ -296,7 +298,7 @@ internal abstract class GenerateSyntheticLinkageImportProject : DefaultTask(), U
                 Family.OSX -> {
                     val deploymentTarget = explicitOrMaximumDeploymentTarget(
                         macosDeploymentVersion,
-                        MACOS_DEPLOYMENT_TARGET_DEFAULT,
+                        implicitDeploymentTargetDefault(Family.OSX, MACOS_DEPLOYMENT_TARGET_DEFAULT),
                         dependencyIdentifierToImportedSwiftPMDependencies.get().metadataByDependencyIdentifier.values.mapNotNull { it.macosDeploymentVersion },
                     )
                     ".macOS(\"${deploymentTarget}\")"
@@ -304,7 +306,7 @@ internal abstract class GenerateSyntheticLinkageImportProject : DefaultTask(), U
                 Family.IOS -> {
                     val deploymentTarget = explicitOrMaximumDeploymentTarget(
                         iosDeploymentVersion,
-                        IOS_DEPLOYMENT_TARGET_DEFAULT,
+                        implicitDeploymentTargetDefault(Family.IOS, IOS_DEPLOYMENT_TARGET_DEFAULT),
                         dependencyIdentifierToImportedSwiftPMDependencies.get().metadataByDependencyIdentifier.values.mapNotNull { it.iosDeploymentVersion },
                     )
                     ".iOS(\"${deploymentTarget}\")"
@@ -312,7 +314,7 @@ internal abstract class GenerateSyntheticLinkageImportProject : DefaultTask(), U
                 Family.TVOS -> {
                     val deploymentTarget = explicitOrMaximumDeploymentTarget(
                         tvosDeploymentVersion,
-                        TVOS_DEPLOYMENT_TARGET_DEFAULT,
+                        implicitDeploymentTargetDefault(Family.TVOS, TVOS_DEPLOYMENT_TARGET_DEFAULT),
                         dependencyIdentifierToImportedSwiftPMDependencies.get().metadataByDependencyIdentifier.values.mapNotNull { it.tvosDeploymentVersion },
                     )
                     ".tvOS(\"${deploymentTarget}\")"
@@ -320,7 +322,7 @@ internal abstract class GenerateSyntheticLinkageImportProject : DefaultTask(), U
                 Family.WATCHOS -> {
                     val deploymentTarget = explicitOrMaximumDeploymentTarget(
                         watchosDeploymentVersion,
-                        WATCHOS_DEPLOYMENT_TARGET_DEFAULT,
+                        implicitDeploymentTargetDefault(Family.WATCHOS, WATCHOS_DEPLOYMENT_TARGET_DEFAULT),
                         dependencyIdentifierToImportedSwiftPMDependencies.get().metadataByDependencyIdentifier.values.mapNotNull { it.watchosDeploymentVersion },
                     )
                     ".watchOS(\"${deploymentTarget}\")"
@@ -391,6 +393,30 @@ internal abstract class GenerateSyntheticLinkageImportProject : DefaultTask(), U
         return "${maximumDeploymentTarget.major}.${maximumDeploymentTarget.minor}"
     }
 
+    /**
+     * KT-86663: Align the implicit deployment target defaults with the minimum OS versions declared
+     * in konan.properties of the current Kotlin/Native distribution, so the synthetic package builds
+     * against the same deployment targets the Kotlin/Native compiler links the final binary with.
+     *
+     * Falls back to [hardcodedDefault] when the distribution properties are not available
+     * (e.g. the Kotlin/Native distribution was not provisioned yet).
+     */
+    private fun implicitDeploymentTargetDefault(family: Family, hardcodedDefault: String): String {
+        val distributionMinimumVersions = konanTargets.get()
+            .filter { it.family == family }
+            .mapNotNull { target -> distributionMinimalOsVersion(target) }
+        return distributionMinimumVersions.maxByOrNull {
+            SemVer.from(it, loose = true)
+        } ?: hardcodedDefault
+    }
+
+    private fun distributionMinimalOsVersion(target: KonanTarget): String? = try {
+        konanPropertiesService.orNull?.targetMinimalOsVersion(target)
+    } catch (e: Exception) {
+        logger.info("Failed to read the minimum deployment version for $target from the Kotlin/Native distribution properties", e)
+        null
+    }
+
     companion object {
         const val TASK_NAME = "generateSyntheticLinkageSwiftPMImportProject"
         const val SYNTHETIC_IMPORT_TARGET_MAGIC_NAME = "KotlinMultiplatformLinkedPackage"
@@ -409,7 +435,7 @@ internal abstract class GenerateSyntheticLinkageImportProject : DefaultTask(), U
                 identifier,
             )
 
-        // Align these with konan.properties: KT-86663
+        // Fallbacks for when konan.properties of the Kotlin/Native distribution is not available: KT-86663
         const val IOS_DEPLOYMENT_TARGET_DEFAULT = "15.0"
         const val MACOS_DEPLOYMENT_TARGET_DEFAULT = "12.0"
         const val WATCHOS_DEPLOYMENT_TARGET_DEFAULT = "9.0"
