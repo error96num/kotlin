@@ -165,9 +165,16 @@ internal abstract class FetchSyntheticImportProjectPackages : DefaultTask() {
             exclude.createNewFile()
         }
 
-        val entry = "${checkoutDir.name}/"
-
-        exclude.writeText(entry)
+        // KT-85741: besides the checkout dir, SwiftPM and Xcode create `.build` and `.swiftpm`
+        // dirs inside the synthetic package that lives in this lock dir. None of these should be
+        // committed alongside the persisted lock file.
+        exclude.writeText(
+            listOf(
+                "${checkoutDir.name}/",
+                ".build/",
+                ".swiftpm/",
+            ).joinToString(separator = "\n", postfix = "\n")
+        )
     }
 
     private fun checkoutSwiftPMDependencies(errorFile: File) {

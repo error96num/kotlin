@@ -105,7 +105,7 @@ class SwiftPMImportPersistentIdentifierPackageLockIntegrationTests : KGPBaseTest
 
                     assertGitIgnoreEquals(
                         identifierGitIgnore,
-                        "swiftPMCheckout/",
+                        "swiftPMCheckout/\n.build/\n.swiftpm/\n",
                     )
                 }
 
@@ -130,7 +130,7 @@ class SwiftPMImportPersistentIdentifierPackageLockIntegrationTests : KGPBaseTest
 
                     assertGitIgnoreEquals(
                         identifierGitIgnore,
-                        "swiftPMCheckout/",
+                        "swiftPMCheckout/\n.build/\n.swiftpm/\n",
                     )
                 }
             }
@@ -218,7 +218,7 @@ class SwiftPMImportPersistentIdentifierPackageLockIntegrationTests : KGPBaseTest
 
                     assertGitIgnoreEquals(
                         identifierGitIgnore,
-                        "swiftPMCheckout/",
+                        "swiftPMCheckout/\n.build/\n.swiftpm/\n",
                     )
                 }
 
@@ -304,7 +304,7 @@ class SwiftPMImportPersistentIdentifierPackageLockIntegrationTests : KGPBaseTest
 
                     assertGitIgnoreEquals(
                         identifierGitIgnore,
-                        "swiftPMCheckout/",
+                        "swiftPMCheckout/\n.build/\n.swiftpm/\n",
                     )
                 }
 
@@ -327,7 +327,7 @@ class SwiftPMImportPersistentIdentifierPackageLockIntegrationTests : KGPBaseTest
                     )
                     assertGitIgnoreEquals(
                         identifierGitIgnore,
-                        "swiftPMCheckout/",
+                        "swiftPMCheckout/\n.build/\n.swiftpm/\n",
                     )
                 }
             }
@@ -409,7 +409,7 @@ class SwiftPMImportPersistentIdentifierPackageLockIntegrationTests : KGPBaseTest
 
                     assertGitIgnoreEquals(
                         identifierGitIgnore,
-                        "swiftPMCheckout/",
+                        "swiftPMCheckout/\n.build/\n.swiftpm/\n",
                     )
                 }
 
@@ -433,7 +433,7 @@ class SwiftPMImportPersistentIdentifierPackageLockIntegrationTests : KGPBaseTest
 
                     assertGitIgnoreEquals(
                         identifierGitIgnore,
-                        "swiftPMCheckout/",
+                        "swiftPMCheckout/\n.build/\n.swiftpm/\n",
                     )
                 }
 
@@ -460,7 +460,7 @@ class SwiftPMImportPersistentIdentifierPackageLockIntegrationTests : KGPBaseTest
 
                     assertGitIgnoreEquals(
                         identifierGitIgnore,
-                        "swiftPMCheckout/",
+                        "swiftPMCheckout/\n.build/\n.swiftpm/\n",
                     )
                 }
 
@@ -484,7 +484,7 @@ class SwiftPMImportPersistentIdentifierPackageLockIntegrationTests : KGPBaseTest
 
                     assertGitIgnoreEquals(
                         identifierGitIgnore,
-                        "swiftPMCheckout/",
+                        "swiftPMCheckout/\n.build/\n.swiftpm/\n",
                     )
                 }
             }
@@ -585,7 +585,7 @@ class SwiftPMImportPersistentIdentifierPackageLockIntegrationTests : KGPBaseTest
 
                     assertGitIgnoreEquals(
                         identifierGitIgnore,
-                        "swiftPMCheckout/",
+                        "swiftPMCheckout/\n.build/\n.swiftpm/\n",
                     )
                 }
 
@@ -616,7 +616,7 @@ class SwiftPMImportPersistentIdentifierPackageLockIntegrationTests : KGPBaseTest
 
                     assertGitIgnoreEquals(
                         identifierGitIgnore,
-                        "swiftPMCheckout/",
+                        "swiftPMCheckout/\n.build/\n.swiftpm/\n",
                     )
                 }
             }
@@ -726,7 +726,7 @@ class SwiftPMImportPersistentIdentifierPackageLockIntegrationTests : KGPBaseTest
 
                     assertGitIgnoreEquals(
                         identifierGitIgnoreFuzz,
-                        "swiftPMCheckout/",
+                        "swiftPMCheckout/\n.build/\n.swiftpm/\n",
                     )
                 }
 
@@ -753,7 +753,7 @@ class SwiftPMImportPersistentIdentifierPackageLockIntegrationTests : KGPBaseTest
 
                     assertGitIgnoreEquals(
                         identifierGitIgnoreBuzz,
-                        "swiftPMCheckout/",
+                        "swiftPMCheckout/\n.build/\n.swiftpm/\n",
                     )
                 }
             }
