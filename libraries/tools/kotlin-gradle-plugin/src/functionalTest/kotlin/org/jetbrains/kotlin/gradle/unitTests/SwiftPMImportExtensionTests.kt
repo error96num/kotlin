@@ -48,4 +48,41 @@ class SwiftPMImportExtensionTests {
         )
     }
 
+    @Test
+    fun `inferred remote package names - URL edge cases`() {
+        val inferredPackageNames = buildProjectWithMPP().run {
+            locateOrRegisterSwiftPMDependenciesExtension().apply {
+                // Canonical https URLs with and without the ".git" suffix
+                swiftPackage("https://github.com/foo/bar.git", "1.0.0", listOf("product"))
+                swiftPackage("https://github.com/foo/bar", "1.0.0", listOf("product"))
+                // Trailing slashes must not produce an empty package name
+                swiftPackage("https://github.com/foo/bar/", "1.0.0", listOf("product"))
+                swiftPackage("https://github.com/foo/bar.git/", "1.0.0", listOf("product"))
+                // scp-style Git locations
+                swiftPackage("git@github.com:apple/swift-nio.git", "1.0.0", listOf("product"))
+                swiftPackage("git@github.com:swift-nio.git", "1.0.0", listOf("product"))
+                // ".git" appearing in the middle of the package name is not a suffix
+                swiftPackage("https://example.com/my.gitops.git", "1.0.0", listOf("product"))
+                swiftPackage("https://example.com/my.gitops", "1.0.0", listOf("product"))
+                // ssh URLs
+                swiftPackage("ssh://git@github.com/foo/bar.git", "1.0.0", listOf("product"))
+            }.swiftPMDependencies.map { it.packageName }
+        }
+
+        assertEquals(
+            listOf(
+                "bar",
+                "bar",
+                "bar",
+                "bar",
+                "swift-nio",
+                "swift-nio",
+                "my.gitops",
+                "my.gitops",
+                "bar",
+            ).prettyPrinted,
+            inferredPackageNames.prettyPrinted,
+        )
+    }
+
 }

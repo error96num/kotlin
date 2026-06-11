@@ -384,8 +384,17 @@ abstract class SwiftPMImportExtension @Inject constructor(
     fun noSynchronization(): PackageResolvedSynchronization =
         PackageResolvedSynchronization.None
 
-    // FIXME: KT-84695 Check and test if this is actually correct
-    private fun inferPackageName(url: String) = url.split("/").last().split(".git").first()
+    /**
+     * Infers the SwiftPM package name from the repository URL the same way SwiftPM derives the package
+     * identity: take the last path component and drop the ".git" suffix if present.
+     *
+     * Trailing slashes are ignored and scp-style locations ("git@host:repository.git") are supported.
+     */
+    private fun inferPackageName(url: String) = url
+        .trimEnd('/')
+        .substringAfterLast("/")
+        .substringAfterLast(":")
+        .removeSuffix(".git")
 
     private fun inferLocalPackageName(directory: Directory): String {
         return directory.asFile.toPath().toAbsolutePath().normalize().fileName?.toString()
